@@ -1,0 +1,114 @@
+# Revised Cardiac Risk Index (RCRI / Lee Index)
+# Source: Lee et al. 1999, Updated ACC/AHA Guidelines
+
+name: "RCRI (Revised Cardiac Risk Index)"
+name_de: "RCRI (Revised Cardiac Risk Index)"
+specialty: Anesthesiology
+specialty_de: "Anästhesiologie"
+version: "2024-v1"
+guideline_source: "ACC/AHA 2022"
+reference: "Lee TH, et al. Derivation and prospective validation of a simple index for prediction of cardiac risk of major noncardiac surgery. Circulation. 1999;100(10):1043-9."
+validation_status: "peer_reviewed"
+description: "Prediction of perioperative cardiac complications in noncardiac surgery"
+description_de: "Vorhersage perioperativer kardialer Komplikationen bei nicht-kardialer Chirurgie"
+
+inputs:
+  - field: "high_risk_surgery"
+    type: "boolean"
+    label: "High-Risk Surgery"
+    label_de: "Hochrisiko-Chirurgie"
+    points: 1
+    help: "Intraperitoneal, intrathoracic, or suprainguinal vascular surgery"
+    help_de: "Intraperitoneale, intrathorakale oder suprainguinale Gefäßchirurgie"
+    required: true
+
+  - field: "ischemic_heart_disease"
+    type: "boolean"
+    label: "History of Ischemic Heart Disease"
+    label_de: "Ischämische Herzerkrankung in der Anamnese"
+    points: 1
+    help: "History of MI, positive stress test, chest pain due to ischemia, nitrate use, ECG with Q waves"
+    help_de: "Anamnese eines MI, positiver Belastungstest, Thoraxschmerz durch Ischämie, Nitrat-Verwendung, EKG mit Q-Zacken"
+    required: true
+
+  - field: "heart_failure"
+    type: "boolean"
+    label: "History of Congestive Heart Failure"
+    label_de: "Herzinsuffizienz in der Anamnese"
+    points: 1
+    help: "History of CHF, pulmonary edema, PND, bilateral rales, S3 gallop, or CXR with pulmonary edema"
+    help_de: "Anamnese einer Herzinsuffizienz, Lungenödem, PND, beidseitige Rasselgeräusche, S3-Galopp oder Thorax-Röntgen mit Lungenödem"
+    required: true
+
+  - field: "cerebrovascular_disease"
+    type: "boolean"
+    label: "History of Cerebrovascular Disease"
+    label_de: "Zerebrovaskuläre Erkrankung in der Anamnese"
+    points: 1
+    help: "History of TIA or stroke"
+    help_de: "Anamnese einer TIA oder eines Schlaganfalls"
+    required: true
+
+  - field: "diabetes_insulin"
+    type: "boolean"
+    label: "Diabetes on Insulin Therapy"
+    label_de: "Diabetes mit Insulintherapie"
+    points: 1
+    help: "Preoperative treatment with insulin (not oral hypoglycemics alone)"
+    help_de: "Präoperative Behandlung mit Insulin (nicht orale Antidiabetika allein)"
+    required: true
+
+  - field: "renal_insufficiency"
+    type: "boolean"
+    label: "Renal Insufficiency"
+    label_de: "Niereninsuffizienz"
+    points: 1
+    help: "Preoperative creatinine >177 μmol/L (>2.0 mg/dL)"
+    help_de: "Präoperatives Kreatinin >177 μmol/L (>2,0 mg/dL)"
+    required: true
+
+interpretation:
+  - score: 0
+    risk: "Class I - Very Low Risk"
+    risk_de: "Klasse I - Sehr niedriges Risiko"
+    risk_level: VeryLow
+    recommendation: "Very low risk of major cardiac event. Routine perioperative management. Risk of major cardiac event: 0.4%"
+    recommendation_de: "Sehr niedriges Risiko für schweres kardiales Ereignis. Routinemäßiges perioperatives Management. Risiko: 0,4%"
+    details: "Cardiac death, MI, or cardiac arrest risk: 0.4%"
+    details_de: "Risiko für kardialen Tod, MI oder Herzstillstand: 0,4%"
+
+  - score: 1
+    risk: "Class II - Low Risk"
+    risk_de: "Klasse II - Niedriges Risiko"
+    risk_level: Low
+    recommendation: "Low risk of major cardiac event. Standard perioperative care appropriate. Risk of major cardiac event: 1.0%"
+    recommendation_de: "Niedriges Risiko für schweres kardiales Ereignis. Standardmäßige perioperative Versorgung angemessen. Risiko: 1,0%"
+    details: "Cardiac death, MI, or cardiac arrest risk: 1.0%"
+    details_de: "Risiko für kardialen Tod, MI oder Herzstillstand: 1,0%"
+
+  - score: 2
+    risk: "Class III - Moderate Risk"
+    risk_de: "Klasse III - Mäßiges Risiko"
+    risk_level: Moderate
+    recommendation: "Moderate risk. Consider further cardiac evaluation if it will change management. Enhanced monitoring may be appropriate. Risk of major cardiac event: 2.4%"
+    recommendation_de: "Mäßiges Risiko. Weitere kardiale Evaluation erwägen, wenn sie das Management ändert. Erweitertes Monitoring kann angebracht sein. Risiko: 2,4%"
+    details: "Cardiac death, MI, or cardiac arrest risk: 2.4%"
+    details_de: "Risiko für kardialen Tod, MI oder Herzstillstand: 2,4%"
+
+  - score: "≥3"
+    risk: "Class IV - High Risk"
+    risk_de: "Klasse IV - Hohes Risiko"
+    risk_level: High
+    recommendation: "High risk of major cardiac event. Consider cardiology consultation. May need further workup (echo, stress test). Enhanced perioperative monitoring recommended. Consider ICU/HDU care. Risk of major cardiac event: ≥5.4%"
+    recommendation_de: "Hohes Risiko für schweres kardiales Ereignis. Kardiologische Konsultation erwägen. Weitere Diagnostik möglich (Echo, Belastungstest). Erweitertes perioperatives Monitoring empfohlen. ICU/IMC-Versorgung erwägen. Risiko: ≥5,4%"
+    details: "Cardiac death, MI, or cardiac arrest risk: 5.4-11%. Consider delaying elective surgery for optimization."
+    details_de: "Risiko für kardialen Tod, MI oder Herzstillstand: 5,4-11%. Bei elektiver Operation Verzögerung zur Optimierung erwägen."
+
+metadata:
+  tags: "cardiac risk, perioperative, noncardiac surgery, RCRI, Lee index"
+  keywords_de: "kardiales Risiko, perioperativ, nicht-kardiale Chirurgie"
+  category: "risk_stratification"
+  target_population: "Adults ≥50 years undergoing noncardiac surgery"
+  guideline_year: "1999"
+  max_score: "6"
+  note: "Most widely used and validated tool for perioperative cardiac risk assessment"

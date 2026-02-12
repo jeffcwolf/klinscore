@@ -1,0 +1,117 @@
+# CHA2DS2-VA Score for Atrial Fibrillation Stroke Risk
+# Source: ESC Guidelines 2024
+
+name: "CHA2DS2-VA Score"
+name_de: "CHA2DS2-VA-Score"
+specialty: Cardiology
+specialty_de: "Kardiologie"
+version: "2024-v1"
+guideline_source: "ESC 2024"
+reference: "ESC Guidelines for the management of atrial fibrillation developed in collaboration with EACTS. Eur Heart J. 2024;45(36):3314-3414. doi:10.1093/eurheartj/ehad123"
+validation_status: "peer_reviewed"
+description: "Stroke risk stratification in patients with atrial fibrillation"
+description_de: "Schlaganfallrisiko-Stratifizierung bei Patienten mit Vorhofflimmern"
+
+inputs:
+  - field: "age"
+    type: "number"
+    label: "Age"
+    label_de: "Alter"
+    unit: "years"
+    unit_de: "Jahre"
+    min: 18
+    max: 120
+    points:
+      - condition: ">= 75"
+        points: 2
+        label: "Age ≥75 years"
+        label_de: "Alter ≥75 Jahre"
+      - condition: ">= 65"
+        points: 1
+        label: "Age 65-74 years"
+        label_de: "Alter 65-74 Jahre"
+    help: "Age in years"
+    help_de: "Alter in Jahren"
+    required: true
+
+  - field: "heart_failure"
+    type: "boolean"
+    label: "Congestive Heart Failure"
+    label_de: "Herzinsuffizienz"
+    points: 1
+    help: "History of CHF or objective evidence of moderate to severe LV systolic dysfunction (e.g., LVEF ≤40%)"
+    help_de: "Anamnese einer Herzinsuffizienz oder objektiver Nachweis einer mittel- bis schwergradigen LV-Dysfunktion (z.B. LVEF ≤40%)"
+    required: true
+
+  - field: "hypertension"
+    type: "boolean"
+    label: "Hypertension"
+    label_de: "Hypertonie"
+    points: 1
+    help: "Blood pressure consistently >140/90 mmHg or on antihypertensive treatment"
+    help_de: "Blutdruck durchgehend >140/90 mmHg oder antihypertensive Behandlung"
+    required: true
+
+  - field: "diabetes"
+    type: "boolean"
+    label: "Diabetes Mellitus"
+    label_de: "Diabetes mellitus"
+    points: 1
+    help: "Fasting glucose >125 mg/dL (7.0 mmol/L) or on hypoglycemic treatment"
+    help_de: "Nüchternglukose >125 mg/dL (7,0 mmol/L) oder unter blutzuckersenkender Behandlung"
+    required: true
+
+  - field: "stroke_tia"
+    type: "boolean"
+    label: "Prior Stroke, TIA, or Thromboembolism"
+    label_de: "Schlaganfall, TIA oder Thromboembolie in der Anamnese"
+    points: 2
+    help: "Previous stroke, transient ischemic attack, or systemic thromboembolism"
+    help_de: "Früherer Schlaganfall, transitorische ischämische Attacke oder systemische Thromboembolie"
+    required: true
+
+  - field: "vascular_disease"
+    type: "boolean"
+    label: "Vascular Disease"
+    label_de: "Gefäßerkrankung"
+    points: 1
+    help: "Prior myocardial infarction, peripheral artery disease, or aortic plaque"
+    help_de: "Früherer Myokardinfarkt, periphere arterielle Verschlusskrankheit oder Aortenplaque"
+    required: true
+
+interpretation:
+  - score: 0
+    risk: "Low"
+    risk_de: "Niedrig"
+    risk_level: Low
+    recommendation: "Anticoagulation not routinely recommended. Consider if additional stroke risk factors are present. Annual stroke risk: 0-0.2%"
+    recommendation_de: "Antikoagulation nicht routinemäßig empfohlen. Erwägen, wenn zusätzliche Schlaganfallrisikofaktoren vorhanden sind. Jährliches Schlaganfallrisiko: 0-0,2%"
+    details: "Very low risk. May consider antiplatelet therapy or no antithrombotic therapy based on bleeding risk."
+    details_de: "Sehr niedriges Risiko. Thrombozytenaggregationshemmung oder keine antithrombotische Therapie je nach Blutungsrisiko erwägen."
+
+  - score: 1
+    risk: "Low-Moderate"
+    risk_de: "Niedrig-Mittel"
+    risk_level: Moderate
+    recommendation: "Consider oral anticoagulation. Individualized decision based on patient preference, bleeding risk (HAS-BLED), and shared decision-making. Annual stroke risk: 0.6-2.0%"
+    recommendation_de: "Orale Antikoagulation erwägen. Individuelle Entscheidung basierend auf Patientenpräferenz, Blutungsrisiko (HAS-BLED) und gemeinsamer Entscheidungsfindung. Jährliches Schlaganfallrisiko: 0,6-2,0%"
+    details: "ESC recommends considering OAC for males with score ≥1 and females with score ≥2"
+    details_de: "ESC empfiehlt OAK bei Männern mit Score ≥1 und Frauen mit Score ≥2 zu erwägen"
+
+  - score: "≥2"
+    risk: "Moderate-High"
+    risk_de: "Mittel-Hoch"
+    risk_level: High
+    recommendation: "Oral anticoagulation recommended unless contraindicated (ESC Class I, Level A). Prefer DOAC (dabigatran, rivaroxaban, apixaban, edoxaban) over VKA in DOAC-eligible patients. Annual stroke risk: >2.2%"
+    recommendation_de: "Orale Antikoagulation empfohlen, außer kontraindiziert (ESC Klasse I, Level A). DOAK (Dabigatran, Rivaroxaban, Apixaban, Edoxaban) gegenüber VKA bei DOAK-geeigneten Patienten bevorzugen. Jährliches Schlaganfallrisiko: >2,2%"
+    details: "High risk. Strong indication for OAC. Consider HAS-BLED score for bleeding risk assessment."
+    details_de: "Hohes Risiko. Starke Indikation für OAK. HAS-BLED-Score zur Blutungsrisikoabschätzung erwägen."
+
+metadata:
+  tags: "atrial fibrillation, stroke risk, anticoagulation, DOAC, NOAC, warfarin, ESC guidelines"
+  keywords_de: "Vorhofflimmern, Schlaganfallrisiko, Antikoagulation, DOAK, NOAK, Warfarin, ESC-Leitlinien"
+  category: "risk_stratification"
+  target_population: "Adults with atrial fibrillation"
+  doi: "10.1093/eurheartj/ehad123"
+  guideline_year: "2024"
+  max_score: "9"

@@ -1,0 +1,217 @@
+# GRACE Score (Global Registry of Acute Coronary Events)
+# Source: Fox et al. 2006, ESC Guidelines 2020
+
+name: "GRACE ACS Risk Score"
+name_de: "GRACE-ACS-Risiko-Score"
+specialty: Cardiology
+specialty_de: "Kardiologie"
+version: "2024-v1"
+guideline_source: "ESC 2020"
+reference: "Fox KA, et al. Prediction of risk of death and myocardial infarction in the six months after presentation with acute coronary syndrome: prospective multinational observational study (GRACE). BMJ. 2006;333(7578):1091."
+validation_status: "peer_reviewed"
+description: "Risk stratification for in-hospital and 6-month mortality in acute coronary syndrome"
+description_de: "Risikostratifizierung für Krankenhaus- und 6-Monats-Mortalität bei akutem Koronarsyndrom"
+
+inputs:
+  - field: "age"
+    type: "number"
+    label: "Age"
+    label_de: "Alter"
+    unit: "years"
+    unit_de: "Jahre"
+    min: 18
+    max: 120
+    required: true
+    points:
+      - condition: "< 30"
+        points: 0
+      - condition: ">= 30 && < 40"
+        points: 8
+      - condition: ">= 40 && < 50"
+        points: 25
+      - condition: ">= 50 && < 60"
+        points: 41
+      - condition: ">= 60 && < 70"
+        points: 58
+      - condition: ">= 70 && < 80"
+        points: 75
+      - condition: ">= 80 && < 90"
+        points: 91
+      - condition: ">= 90"
+        points: 100
+
+  - field: "heart_rate"
+    type: "number"
+    label: "Heart Rate"
+    label_de: "Herzfrequenz"
+    unit: "bpm"
+    unit_de: "Schläge/min"
+    min: 20
+    max: 300
+    required: true
+    points:
+      - condition: "< 50"
+        points: 0
+      - condition: ">= 50 && < 70"
+        points: 3
+      - condition: ">= 70 && < 90"
+        points: 9
+      - condition: ">= 90 && < 110"
+        points: 15
+      - condition: ">= 110 && < 150"
+        points: 24
+      - condition: ">= 150 && < 200"
+        points: 38
+      - condition: ">= 200"
+        points: 46
+
+  - field: "systolic_bp"
+    type: "number"
+    label: "Systolic Blood Pressure"
+    label_de: "Systolischer Blutdruck"
+    unit: "mmHg"
+    unit_de: "mmHg"
+    min: 40
+    max: 300
+    required: true
+    points:
+      - condition: "< 80"
+        points: 58
+      - condition: ">= 80 && < 100"
+        points: 53
+      - condition: ">= 100 && < 120"
+        points: 43
+      - condition: ">= 120 && < 140"
+        points: 34
+      - condition: ">= 140 && < 160"
+        points: 24
+      - condition: ">= 160 && < 200"
+        points: 10
+      - condition: ">= 200"
+        points: 0
+
+  - field: "creatinine"
+    type: "number"
+    label: "Serum Creatinine"
+    label_de: "Serum-Kreatinin"
+    unit: "μmol/L"
+    unit_de: "μmol/L"
+    min: 10
+    max: 1500
+    help: "To convert from mg/dL: multiply by 88.4"
+    help_de: "Umrechnung von mg/dL: mit 88,4 multiplizieren"
+    required: true
+    points:
+      - condition: "< 35.36"
+        points: 1
+      - condition: ">= 35.36 && < 70.72"
+        points: 4
+      - condition: ">= 70.72 && < 106.08"
+        points: 7
+      - condition: ">= 106.08 && < 141.44"
+        points: 10
+      - condition: ">= 141.44 && < 176.8"
+        points: 13
+      - condition: ">= 176.8 && < 353.6"
+        points: 21
+      - condition: ">= 353.6"
+        points: 28
+
+  - field: "cardiac_arrest"
+    type: "boolean"
+    label: "Cardiac Arrest at Admission"
+    label_de: "Herzstillstand bei Aufnahme"
+    points: 39
+    help: "Resuscitated cardiac arrest on presentation"
+    help_de: "Reanimierter Herzstillstand bei Vorstellung"
+    required: true
+
+  - field: "st_deviation"
+    type: "boolean"
+    label: "ST-Segment Deviation"
+    label_de: "ST-Strecken-Abweichung"
+    points: 28
+    help: "ST-segment elevation or depression on ECG"
+    help_de: "ST-Strecken-Hebung oder -Senkung im EKG"
+    required: true
+
+  - field: "elevated_enzymes"
+    type: "boolean"
+    label: "Elevated Cardiac Enzymes"
+    label_de: "Erhöhte Herzenzyme"
+    points: 14
+    help: "Elevated troponin or CK-MB"
+    help_de: "Erhöhtes Troponin oder CK-MB"
+    required: true
+
+  - field: "killip_class"
+    type: "dropdown"
+    label: "Killip Class"
+    label_de: "Killip-Klassifikation"
+    points: 0
+    required: true
+    options:
+      - value: "killip_1"
+        label: "Killip I - No heart failure"
+        label_de: "Killip I - Keine Herzinsuffizienz"
+        points: 0
+        description: "No clinical signs of heart failure"
+        description_de: "Keine klinischen Zeichen einer Herzinsuffizienz"
+
+      - value: "killip_2"
+        label: "Killip II - Mild heart failure"
+        label_de: "Killip II - Leichte Herzinsuffizienz"
+        points: 20
+        description: "Rales, S3 gallop, elevated JVP"
+        description_de: "Rasselgeräusche, S3-Galopp, erhöhter JVD"
+
+      - value: "killip_3"
+        label: "Killip III - Pulmonary edema"
+        label_de: "Killip III - Lungenödem"
+        points: 39
+        description: "Frank pulmonary edema"
+        description_de: "Manifestes Lungenödem"
+
+      - value: "killip_4"
+        label: "Killip IV - Cardiogenic shock"
+        label_de: "Killip IV - Kardiogener Schock"
+        points: 59
+        description: "Cardiogenic shock (SBP <90 mmHg with signs of hypoperfusion)"
+        description_de: "Kardiogener Schock (RR <90 mmHg mit Hypoperfusionszeichen)"
+
+interpretation:
+  - score: "0-108"
+    risk: "Low Risk"
+    risk_de: "Niedriges Risiko"
+    risk_level: Low
+    recommendation: "Low risk of in-hospital death (<1%) and 6-month death (<3%). Standard ACS management. Early discharge may be considered if clinically stable."
+    recommendation_de: "Niedriges Risiko für Krankenhaus-Tod (<1%) und 6-Monats-Tod (<3%). Standard-ACS-Management. Frühe Entlassung kann erwogen werden, wenn klinisch stabil."
+    details: "In-hospital mortality <1%, 6-month mortality <3%"
+    details_de: "Krankenhaus-Mortalität <1%, 6-Monats-Mortalität <3%"
+
+  - score: "109-140"
+    risk: "Intermediate Risk"
+    risk_de: "Mittleres Risiko"
+    risk_level: Moderate
+    recommendation: "Intermediate risk of in-hospital death (1-3%) and 6-month death (3-8%). Early invasive strategy within 72 hours. Enhanced monitoring recommended."
+    recommendation_de: "Mittleres Risiko für Krankenhaus-Tod (1-3%) und 6-Monats-Tod (3-8%). Frühe invasive Strategie innerhalb 72 Stunden. Erweitertes Monitoring empfohlen."
+    details: "In-hospital mortality 1-3%, 6-month mortality 3-8%"
+    details_de: "Krankenhaus-Mortalität 1-3%, 6-Monats-Mortalität 3-8%"
+
+  - score: ">140"
+    risk: "High Risk"
+    risk_de: "Hohes Risiko"
+    risk_level: High
+    recommendation: "High risk of in-hospital death (>3%) and 6-month death (>8%). Urgent/immediate invasive strategy indicated (<24 hours, ideally <2 hours if very high risk). Intensive monitoring required. Consider mechanical circulatory support if shock present."
+    recommendation_de: "Hohes Risiko für Krankenhaus-Tod (>3%) und 6-Monats-Tod (>8%). Dringliche/sofortige invasive Strategie indiziert (<24h, idealerweise <2h bei sehr hohem Risiko). Intensivmonitoring erforderlich. Mechanische Kreislaufunterstützung erwägen bei Schock."
+    details: "In-hospital mortality >3%, 6-month mortality >8%. Score >140 = very high risk requiring immediate intervention."
+    details_de: "Krankenhaus-Mortalität >3%, 6-Monats-Mortalität >8%. Score >140 = sehr hohes Risiko, sofortige Intervention erforderlich."
+
+metadata:
+  tags: "ACS, NSTEMI, STEMI, acute coronary syndrome, mortality risk, GRACE"
+  keywords_de: "ACS, NSTEMI, STEMI, akutes Koronarsyndrom, Mortalitätsrisiko, GRACE"
+  category: "risk_stratification"
+  target_population: "Adults with acute coronary syndrome (STEMI, NSTEMI, unstable angina)"
+  guideline_year: "2006"
+  max_score: "372"
+  note: "Validated for both STEMI and NSTEMI. Guides timing of invasive strategy per ESC 2020 guidelines. More accurate than TIMI score."

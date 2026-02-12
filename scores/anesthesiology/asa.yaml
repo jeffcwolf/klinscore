@@ -1,0 +1,123 @@
+# ASA Physical Status Classification
+# Source: American Society of Anesthesiologists
+
+name: "ASA Physical Status"
+name_de: "ASA-Klassifikation"
+specialty: Anesthesiology
+specialty_de: "Anästhesiologie"
+version: "2024-v1"
+guideline_source: "ASA 2020"
+reference: "American Society of Anesthesiologists. ASA Physical Status Classification System. Updated October 2020."
+validation_status: "peer_reviewed"
+description: "Preoperative physical status classification for perioperative risk assessment"
+description_de: "Präoperative Klassifikation des körperlichen Zustands zur perioperativen Risikoabschätzung"
+
+inputs:
+  - field: "asa_class"
+    type: "dropdown"
+    label: "ASA Physical Status Class"
+    label_de: "ASA-Klassifikation"
+    points: 0
+    options:
+      - value: "asa_1"
+        label: "ASA I - Normal healthy patient"
+        label_de: "ASA I - Normaler gesunder Patient"
+        points: 1
+        description: "No organic, physiologic, or psychiatric disturbance"
+        description_de: "Keine organischen, physiologischen oder psychiatrischen Störungen"
+
+      - value: "asa_2"
+        label: "ASA II - Mild systemic disease"
+        label_de: "ASA II - Leichte systemische Erkrankung"
+        points: 2
+        description: "Well-controlled disease (e.g., controlled HTN, obesity, pregnancy)"
+        description_de: "Gut kontrollierte Erkrankung (z.B. kontrollierte Hypertonie, Adipositas, Schwangerschaft)"
+
+      - value: "asa_3"
+        label: "ASA III - Severe systemic disease"
+        label_de: "ASA III - Schwere systemische Erkrankung"
+        points: 3
+        description: "Substantive functional limitation (e.g., poorly controlled DM, COPD, morbid obesity)"
+        description_de: "Erhebliche funktionelle Einschränkung (z.B. schlecht kontrollierter Diabetes, COPD, morbide Adipositas)"
+
+      - value: "asa_4"
+        label: "ASA IV - Severe disease, constant threat to life"
+        label_de: "ASA IV - Schwere Erkrankung, ständige Lebensbedrohung"
+        points: 4
+        description: "Life-threatening disease (e.g., recent MI, CVA, sepsis)"
+        description_de: "Lebensbedrohliche Erkrankung (z.B. kürzlicher MI, Schlaganfall, Sepsis)"
+
+      - value: "asa_5"
+        label: "ASA V - Moribund, not expected to survive"
+        label_de: "ASA V - Moribund, Überleben unwahrscheinlich"
+        points: 5
+        description: "Not expected to survive without operation (e.g., ruptured AAA, massive trauma)"
+        description_de: "Überleben ohne Operation nicht erwartet (z.B. rupturiertes AAA, massives Trauma)"
+
+      - value: "asa_6"
+        label: "ASA VI - Brain dead (organ donor)"
+        label_de: "ASA VI - Hirntod (Organspende)"
+        points: 6
+        description: "Declared brain-dead, organs being removed for donor purposes"
+        description_de: "Hirntod festgestellt, Organentnahme zur Spende"
+    required: true
+
+  - field: "emergency"
+    type: "boolean"
+    label: "Emergency Surgery (add 'E')"
+    label_de: "Notfalloperation ('E' hinzufügen)"
+    points: 0
+    help: "If surgery is emergent, add 'E' suffix (e.g., ASA III-E)"
+    help_de: "Bei Notfalloperation 'E'-Suffix hinzufügen (z.B. ASA III-E)"
+    required: false
+
+interpretation:
+  - score: 1
+    risk: "ASA I - Minimal Risk"
+    risk_de: "ASA I - Minimales Risiko"
+    risk_level: VeryLow
+    recommendation: "Healthy patient. Routine perioperative management. Mortality risk <0.1%"
+    recommendation_de: "Gesunder Patient. Routinemäßiges perioperatives Management. Mortalitätsrisiko <0,1%"
+
+  - score: 2
+    risk: "ASA II - Low Risk"
+    risk_de: "ASA II - Niedriges Risiko"
+    risk_level: Low
+    recommendation: "Mild systemic disease. Standard perioperative care. Mortality risk 0.1-0.2%"
+    recommendation_de: "Leichte systemische Erkrankung. Standardmäßige perioperative Versorgung. Mortalitätsrisiko 0,1-0,2%"
+
+  - score: 3
+    risk: "ASA III - Moderate Risk"
+    risk_de: "ASA III - Mäßiges Risiko"
+    risk_level: Moderate
+    recommendation: "Severe systemic disease with functional limitation. Enhanced monitoring may be needed. Consider ICU/HDU postoperatively. Mortality risk 1.8-5.4%"
+    recommendation_de: "Schwere systemische Erkrankung mit funktioneller Einschränkung. Erweitertes Monitoring möglich. ICU/IMC postoperativ erwägen. Mortalitätsrisiko 1,8-5,4%"
+
+  - score: 4
+    risk: "ASA IV - High Risk"
+    risk_de: "ASA IV - Hohes Risiko"
+    risk_level: High
+    recommendation: "Life-threatening disease. High-level monitoring required. ICU/HDU care likely needed. Consider risks vs. benefits carefully. Mortality risk 7.8-25.9%"
+    recommendation_de: "Lebensbedrohliche Erkrankung. Intensivmonitoring erforderlich. ICU/IMC-Versorgung wahrscheinlich nötig. Risiko-Nutzen-Abwägung sorgfältig. Mortalitätsrisiko 7,8-25,9%"
+
+  - score: 5
+    risk: "ASA V - Extreme Risk"
+    risk_de: "ASA V - Extremes Risiko"
+    risk_level: VeryHigh
+    recommendation: "Moribund patient. Surgery often last resort. Maximal support required. Mortality risk 9.4-57.8%"
+    recommendation_de: "Moribunder Patient. Operation oft letzte Option. Maximale Unterstützung erforderlich. Mortalitätsrisiko 9,4-57,8%"
+
+  - score: 6
+    risk: "ASA VI - Brain Death"
+    risk_de: "ASA VI - Hirntod"
+    risk_level: None
+    recommendation: "Brain-dead patient for organ donation"
+    recommendation_de: "Hirntoter Patient zur Organspende"
+
+metadata:
+  tags: "anesthesia, perioperative risk, ASA classification, surgery"
+  keywords_de: "Anästhesie, perioperatives Risiko, ASA-Klassifikation, Chirurgie"
+  category: "risk_stratification"
+  target_population: "All surgical patients"
+  guideline_year: "2020"
+  note: "Emergency modifier 'E' indicates increased risk but doesn't change numeric class"

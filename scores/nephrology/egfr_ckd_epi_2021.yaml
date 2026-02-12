@@ -1,0 +1,110 @@
+# eGFR CKD-EPI 2021 Equation (Race-Free)
+# Source: KDIGO 2024
+
+name: "eGFR CKD-EPI 2021"
+name_de: "eGFR CKD-EPI 2021"
+specialty: Nephrology
+specialty_de: "Nephrologie"
+version: "2024-v1"
+guideline_source: "KDIGO 2024"
+reference: "Inker LA, et al. New Creatinine- and Cystatin C-Based Equations to Estimate GFR without Race. N Engl J Med. 2021;385(19):1737-1749."
+validation_status: "peer_reviewed"
+description: "Kidney function estimation using 2021 race-free CKD-EPI equation"
+description_de: "Nierenfunktionsschätzung mit der 2021 rassenfreien CKD-EPI-Gleichung"
+
+inputs:
+  - field: "age"
+    type: "number"
+    label: "Age"
+    label_de: "Alter"
+    unit: "years"
+    unit_de: "Jahre"
+    min: 18
+    max: 120
+    points: 0
+    required: true
+
+  - field: "sex"
+    type: "boolean"
+    label: "Female Sex"
+    label_de: "Weibliches Geschlecht"
+    points: 0
+    help: "Check if patient is female"
+    help_de: "Ankreuzen, wenn Patient weiblich ist"
+    required: true
+
+  - field: "creatinine"
+    type: "number"
+    label: "Serum Creatinine"
+    label_de: "Serum-Kreatinin"
+    unit: "μmol/L"
+    unit_de: "μmol/L"
+    min: 10
+    max: 2000
+    points: 0
+    help: "Serum creatinine in μmol/L (to convert from mg/dL: multiply by 88.4)"
+    help_de: "Serum-Kreatinin in μmol/L (Umrechnung von mg/dL: mit 88,4 multiplizieren)"
+    required: true
+
+interpretation:
+  - score: "≥90"
+    risk: "G1 - Normal or High"
+    risk_de: "G1 - Normal oder Hoch"
+    risk_level: VeryLow
+    recommendation: "Normal kidney function. If no other markers of kidney disease, CKD not present. Monitor for risk factors."
+    recommendation_de: "Normale Nierenfunktion. Wenn keine anderen Marker für Nierenerkrankung, keine CKD. Risikofaktoren überwachen."
+    details: "eGFR ≥90 mL/min/1.73m²"
+    details_de: "eGFR ≥90 mL/min/1,73m²"
+
+  - score: "60-89"
+    risk: "G2 - Mildly Decreased"
+    risk_de: "G2 - Leicht vermindert"
+    risk_level: Low
+    recommendation: "Mildly decreased kidney function. If persistent albuminuria or other kidney damage markers present, CKD stage G2. Monitor annually."
+    recommendation_de: "Leicht verminderte Nierenfunktion. Bei persistierender Albuminurie oder anderen Nierenschädigungsmarkern CKD Stadium G2. Jährlich überwachen."
+    details: "eGFR 60-89 mL/min/1.73m²"
+    details_de: "eGFR 60-89 mL/min/1,73m²"
+
+  - score: "45-59"
+    risk: "G3a - Mildly to Moderately Decreased"
+    risk_de: "G3a - Leicht bis mäßig vermindert"
+    risk_level: Moderate
+    recommendation: "Mild-moderate CKD. Evaluate and treat complications. Screen for CKD progression risk factors. Nephrology referral if progressive or complicated."
+    recommendation_de: "Leichte bis mäßige CKD. Komplikationen evaluieren und behandeln. Risikofaktoren für CKD-Progression screenen. Nephrologische Überweisung bei Progression oder Komplikationen."
+    details: "eGFR 45-59 mL/min/1.73m². Check KFRE for progression risk."
+    details_de: "eGFR 45-59 mL/min/1,73m². KFRE für Progressionsrisiko prüfen."
+
+  - score: "30-44"
+    risk: "G3b - Moderately to Severely Decreased"
+    risk_de: "G3b - Mäßig bis stark vermindert"
+    risk_level: High
+    recommendation: "Moderate-severe CKD. Nephrology referral recommended. Monitor complications (anemia, bone disease, acidosis). Medication dose adjustments needed."
+    recommendation_de: "Mäßige bis schwere CKD. Nephrologische Überweisung empfohlen. Komplikationen überwachen (Anämie, Knochenerkrankung, Azidose). Medikamentendosisanpassungen erforderlich."
+    details: "eGFR 30-44 mL/min/1.73m²"
+    details_de: "eGFR 30-44 mL/min/1,73m²"
+
+  - score: "15-29"
+    risk: "G4 - Severely Decreased"
+    risk_de: "G4 - Stark vermindert"
+    risk_level: VeryHigh
+    recommendation: "Severe CKD. Nephrology referral urgent. Prepare for kidney replacement therapy. Manage complications actively. Consider transplant evaluation."
+    recommendation_de: "Schwere CKD. Dringende nephrologische Überweisung. Nierenersatztherapie vorbereiten. Komplikationen aktiv managen. Transplantationsevaluation erwägen."
+    details: "eGFR 15-29 mL/min/1.73m². Pre-ESKD stage."
+    details_de: "eGFR 15-29 mL/min/1,73m². Stadium vor terminaler Niereninsuffizienz."
+
+  - score: "<15"
+    risk: "G5 - Kidney Failure"
+    risk_de: "G5 - Nierenversagen"
+    risk_level: Critical
+    recommendation: "Kidney failure (ESKD). Kidney replacement therapy (dialysis or transplant) required or imminent. Nephrology management essential."
+    recommendation_de: "Nierenversagen (terminale Niereninsuffizienz). Nierenersatztherapie (Dialyse oder Transplantation) erforderlich oder unmittelbar bevorstehend. Nephrologisches Management essenziell."
+    details: "eGFR <15 mL/min/1.73m²"
+    details_de: "eGFR <15 mL/min/1,73m²"
+
+metadata:
+  tags: "kidney function, GFR, creatinine, CKD, nephrology"
+  keywords_de: "Nierenfunktion, GFR, Kreatinin, CKD, Nephrologie"
+  category: "diagnostic"
+  target_population: "Adults ≥18 years"
+  guideline_year: "2021"
+  note: "This is a simplified representation. Actual eGFR calculation requires the full CKD-EPI 2021 formula. Score field represents eGFR value."

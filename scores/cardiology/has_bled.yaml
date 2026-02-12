@@ -1,0 +1,113 @@
+# HAS-BLED Score for Bleeding Risk Assessment
+# Source: ESC Guidelines 2024
+
+name: "HAS-BLED Score"
+name_de: "HAS-BLED-Score"
+specialty: Cardiology
+specialty_de: "Kardiologie"
+version: "2024-v1"
+guideline_source: "ESC 2024"
+reference: "ESC Guidelines for the management of atrial fibrillation. Eur Heart J. 2024;45(36):3314-3414."
+validation_status: "peer_reviewed"
+description: "Bleeding risk assessment in anticoagulated patients with atrial fibrillation"
+description_de: "Blutungsrisikoabschätzung bei antikoagulierten Patienten mit Vorhofflimmern"
+
+inputs:
+  - field: "hypertension"
+    type: "boolean"
+    label: "Hypertension (uncontrolled)"
+    label_de: "Hypertonie (unkontrolliert)"
+    points: 1
+    help: "Systolic BP >160 mmHg"
+    help_de: "Systolischer RR >160 mmHg"
+    required: true
+
+  - field: "abnormal_renal_function"
+    type: "boolean"
+    label: "Abnormal Renal Function"
+    label_de: "Abnorme Nierenfunktion"
+    points: 1
+    help: "Chronic dialysis, transplant, or Cr >200 μmol/L (>2.26 mg/dL)"
+    help_de: "Chronische Dialyse, Transplantation oder Kreatinin >200 μmol/L (>2,26 mg/dL)"
+    required: true
+
+  - field: "abnormal_liver_function"
+    type: "boolean"
+    label: "Abnormal Liver Function"
+    label_de: "Abnorme Leberfunktion"
+    points: 1
+    help: "Chronic hepatic disease or bilirubin >2x ULN with AST/ALT/ALP >3x ULN"
+    help_de: "Chronische Lebererkrankung oder Bilirubin >2x Obergrenze mit AST/ALT/AP >3x Obergrenze"
+    required: true
+
+  - field: "stroke"
+    type: "boolean"
+    label: "Stroke History"
+    label_de: "Schlaganfall in der Anamnese"
+    points: 1
+    help: "Previous stroke"
+    help_de: "Früherer Schlaganfall"
+    required: true
+
+  - field: "bleeding"
+    type: "boolean"
+    label: "Bleeding History or Predisposition"
+    label_de: "Blutung in der Anamnese oder Prädisposition"
+    points: 1
+    help: "Previous major bleeding or predisposition (anemia, etc.)"
+    help_de: "Frühere schwere Blutung oder Prädisposition (Anämie, etc.)"
+    required: true
+
+  - field: "labile_inr"
+    type: "boolean"
+    label: "Labile INR"
+    label_de: "Labile INR"
+    points: 1
+    help: "Unstable/high INRs or poor time in therapeutic range (<60%)"
+    help_de: "Instabile/hohe INR-Werte oder schlechte Zeit im therapeutischen Bereich (<60%)"
+    required: true
+
+  - field: "elderly"
+    type: "boolean"
+    label: "Elderly (>65 years)"
+    label_de: "Ältere Person (>65 Jahre)"
+    points: 1
+    help: "Age over 65 years"
+    help_de: "Alter über 65 Jahre"
+    required: true
+
+  - field: "drugs_alcohol"
+    type: "boolean"
+    label: "Drugs or Alcohol"
+    label_de: "Medikamente oder Alkohol"
+    points: 1
+    help: "Concomitant antiplatelet/NSAID use or alcohol abuse (≥8 drinks/week)"
+    help_de: "Begleitende Thrombozytenaggregationshemmer/NSAR oder Alkoholabusus (≥8 Drinks/Woche)"
+    required: true
+
+interpretation:
+  - score: "0-2"
+    risk: "Low Bleeding Risk"
+    risk_de: "Niedriges Blutungsrisiko"
+    risk_level: Low
+    recommendation: "Relatively low bleeding risk. Anticoagulation generally safe. Consider modifiable risk factors."
+    recommendation_de: "Relativ niedriges Blutungsrisiko. Antikoagulation generell sicher. Modifizierbare Risikofaktoren beachten."
+    details: "Annual major bleeding risk: 1-2%"
+    details_de: "Jährliches Risiko für schwere Blutungen: 1-2%"
+
+  - score: "≥3"
+    risk: "High Bleeding Risk"
+    risk_de: "Hohes Blutungsrisiko"
+    risk_level: High
+    recommendation: "High bleeding risk. Anticoagulation often still indicated (balance with stroke risk), but requires careful monitoring and management of modifiable risk factors. Consider more frequent INR monitoring if on VKA."
+    recommendation_de: "Hohes Blutungsrisiko. Antikoagulation oft trotzdem indiziert (Abwägung mit Schlaganfallrisiko), aber sorgfältige Überwachung und Management modifizierbarer Risikofaktoren erforderlich. Bei VKA häufigere INR-Kontrollen erwägen."
+    details: "Annual major bleeding risk: >3%. Note: High HAS-BLED score should not routinely exclude patients from OAC, but should prompt correction of modifiable bleeding risk factors."
+    details_de: "Jährliches Risiko für schwere Blutungen: >3%. Hinweis: Hoher HAS-BLED-Score sollte Patienten nicht routinemäßig von OAK ausschließen, sondern zur Korrektur modifizierbarer Blutungsrisikofaktoren veranlassen."
+
+metadata:
+  tags: "bleeding risk, anticoagulation, atrial fibrillation, HAS-BLED"
+  keywords_de: "Blutungsrisiko, Antikoagulation, Vorhofflimmern"
+  category: "risk_stratification"
+  target_population: "Adults on anticoagulation for atrial fibrillation"
+  guideline_year: "2024"
+  max_score: "9"

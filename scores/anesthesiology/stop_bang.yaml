@@ -1,0 +1,123 @@
+# STOP-BANG Score for Obstructive Sleep Apnea Screening
+# Source: Chung et al. 2008
+
+name: "STOP-BANG Score"
+name_de: "STOP-BANG-Score"
+specialty: Anesthesiology
+specialty_de: "Anästhesiologie"
+version: "2024-v1"
+guideline_source: "ASA 2014"
+reference: "Chung F, et al. STOP-BANG Questionnaire: A Practical Approach to Screen for Obstructive Sleep Apnea. Chest. 2016;149(3):631-638."
+validation_status: "peer_reviewed"
+description: "Screening tool for obstructive sleep apnea in perioperative setting"
+description_de: "Screening-Tool für obstruktive Schlafapnoe im perioperativen Setting"
+
+inputs:
+  - field: "snoring"
+    type: "boolean"
+    label: "Snoring - Loud snoring"
+    label_de: "Schnarchen - Lautes Schnarchen"
+    points: 1
+    help: "Loud enough to be heard through closed door"
+    help_de: "Laut genug, um durch geschlossene Tür gehört zu werden"
+    required: true
+
+  - field: "tired"
+    type: "boolean"
+    label: "Tired - Daytime tiredness"
+    label_de: "Müdigkeit - Tagesmüdigkeit"
+    points: 1
+    help: "Often feel tired, fatigued, or sleepy during daytime"
+    help_de: "Fühlt sich tagsüber oft müde, erschöpft oder schläfrig"
+    required: true
+
+  - field: "observed"
+    type: "boolean"
+    label: "Observed - Witnessed apnea"
+    label_de: "Beobachtet - Beobachtete Apnoe"
+    points: 1
+    help: "Has anyone observed you stop breathing during sleep"
+    help_de: "Hat jemand beobachtet, dass Sie im Schlaf aufhören zu atmen"
+    required: true
+
+  - field: "pressure"
+    type: "boolean"
+    label: "Pressure - High blood pressure"
+    label_de: "Druck - Hoher Blutdruck"
+    points: 1
+    help: "Treated or untreated hypertension"
+    help_de: "Behandelte oder unbehandelte Hypertonie"
+    required: true
+
+  - field: "bmi"
+    type: "boolean"
+    label: "BMI >35 kg/m²"
+    label_de: "BMI >35 kg/m²"
+    points: 1
+    help: "Body Mass Index greater than 35"
+    help_de: "Body-Mass-Index größer als 35"
+    required: true
+
+  - field: "age"
+    type: "boolean"
+    label: "Age >50 years"
+    label_de: "Alter >50 Jahre"
+    points: 1
+    help: "Older than 50 years"
+    help_de: "Älter als 50 Jahre"
+    required: true
+
+  - field: "neck"
+    type: "boolean"
+    label: "Neck circumference >40 cm"
+    label_de: "Halsumfang >40 cm"
+    points: 1
+    help: "Neck circumference >40 cm (measured around Adam's apple)"
+    help_de: "Halsumfang >40 cm (gemessen um den Adamsapfel)"
+    required: true
+
+  - field: "gender"
+    type: "boolean"
+    label: "Male Gender"
+    label_de: "Männliches Geschlecht"
+    points: 1
+    help: "Patient is male"
+    help_de: "Patient ist männlich"
+    required: true
+
+interpretation:
+  - score: "0-2"
+    risk: "Low Risk for OSA"
+    risk_de: "Niedriges OSA-Risiko"
+    risk_level: Low
+    recommendation: "Low probability of moderate-severe OSA. Routine perioperative management appropriate."
+    recommendation_de: "Niedrige Wahrscheinlichkeit für mittel-schwere OSA. Routinemäßiges perioperatives Management angemessen."
+    details: "Sensitivity for moderate-severe OSA: 93-100%. Low risk group."
+    details_de: "Sensitivität für mittel-schwere OSA: 93-100%. Niedrigrisikogruppe."
+
+  - score: "3-4"
+    risk: "Intermediate Risk for OSA"
+    risk_de: "Mittleres OSA-Risiko"
+    risk_level: Moderate
+    recommendation: "Intermediate probability of moderate-severe OSA (15-45%). Consider sleep study if clinically indicated. Perioperative precautions: avoid sedatives, monitor closely, consider continuous pulse oximetry postop."
+    recommendation_de: "Mittlere Wahrscheinlichkeit für mittel-schwere OSA (15-45%). Schlafstudie erwägen, wenn klinisch indiziert. Perioperative Vorsichtsmaßnahmen: Sedativa vermeiden, engmaschige Überwachung, kontinuierliche Pulsoxymetrie postoperativ erwägen."
+    details: "Moderate risk. Enhanced monitoring recommended."
+    details_de: "Mäßiges Risiko. Erweitertes Monitoring empfohlen."
+
+  - score: "5-8"
+    risk: "High Risk for OSA"
+    risk_de: "Hohes OSA-Risiko"
+    risk_level: High
+    recommendation: "High probability of moderate-severe OSA (50-75%). Consider preoperative sleep study for diagnosis and CPAP titration. Perioperative management: bring CPAP device to hospital, use CPAP postop, avoid opioids if possible, extended monitoring, consider HDU/ICU for high-risk procedures."
+    recommendation_de: "Hohe Wahrscheinlichkeit für mittel-schwere OSA (50-75%). Präoperative Schlafstudie zur Diagnose und CPAP-Titration erwägen. Perioperatives Management: CPAP-Gerät ins Krankenhaus mitbringen, CPAP postoperativ verwenden, Opioide wenn möglich vermeiden, erweiterte Überwachung, IMC/ICU bei Hochrisiko-Eingriffen erwägen."
+    details: "High risk. Score ≥5 has 93% sensitivity for moderate OSA, 100% for severe OSA."
+    details_de: "Hohes Risiko. Score ≥5 hat 93% Sensitivität für mittlere OSA, 100% für schwere OSA."
+
+metadata:
+  tags: "sleep apnea, OSA, STOP-BANG, perioperative screening, airway"
+  keywords_de: "Schlafapnoe, OSA, STOP-BANG, perioperatives Screening, Atemweg"
+  category: "screening"
+  target_population: "Adults undergoing surgery"
+  guideline_year: "2016"
+  max_score: "8"
+  note: "Easy-to-use screening tool with high sensitivity. Does not replace formal sleep study for diagnosis."

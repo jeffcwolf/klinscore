@@ -1,0 +1,215 @@
+# Clinical Score Definition Template
+# Copy this file to add a new score to KlinScore
+# Fill in all required fields and delete the comments
+
+# ==============================================================================
+# BASIC INFORMATION (Required)
+# ==============================================================================
+
+# English name of the score
+name: "Your Score Name"
+
+# German name of the score
+name_de: "Name des Scores auf Deutsch"
+
+# Medical specialty (use PascalCase: Cardiology, Nephrology, Anesthesiology, Emergency, InternalMedicine, Surgery, Other)
+specialty: Cardiology
+
+# German specialty name
+specialty_de: "Kardiologie"
+
+# Version of this score definition (use semantic versioning or date)
+version: "2024-v1"
+
+# Source guideline (e.g., "ESC 2024", "KDIGO 2024", "AWMF S3-Leitlinie")
+guideline_source: "ESC 2024"
+
+# Full reference citation with page numbers if applicable
+reference: "Author et al. Journal Name. 2024;123(4):567-890. doi:10.1234/example"
+
+# Validation status: "peer_reviewed", "draft", "community", "experimental"
+validation_status: "peer_reviewed"
+
+# Optional: Brief description in English
+description: "Brief description of what this score calculates and when to use it"
+
+# Optional: Brief description in German
+description_de: "Kurze Beschreibung, was dieser Score berechnet und wann er verwendet wird"
+
+# ==============================================================================
+# INPUT FIELDS (Required)
+# ==============================================================================
+# Define all input fields needed for the calculation
+
+inputs:
+  # Example 1: Boolean field (checkbox)
+  - field: "heart_failure"           # Unique field identifier (use snake_case)
+    type: "boolean"                  # Type: boolean, number, or dropdown
+    label: "Congestive heart failure"
+    label_de: "Herzinsuffizienz"
+    points: 1                        # Fixed points if true
+    help: "History of CHF diagnosis"
+    help_de: "Anamnese einer Herzinsuffizienz-Diagnose"
+    required: true                   # Whether this field is mandatory
+
+  # Example 2: Number field with age-based conditional points
+  - field: "age"
+    type: "number"
+    label: "Age"
+    label_de: "Alter"
+    unit: "years"
+    unit_de: "Jahre"
+    min: 0                          # Minimum allowed value
+    max: 120                        # Maximum allowed value
+    points:                         # Conditional points based on ranges
+      - condition: ">= 75"
+        points: 2
+        label: "Age ≥75"
+        label_de: "Alter ≥75"
+      - condition: ">= 65"
+        points: 1
+        label: "Age 65-74"
+        label_de: "Alter 65-74"
+    required: true
+
+  # Example 3: Dropdown selection
+  - field: "severity_class"
+    type: "dropdown"
+    label: "Severity Class"
+    label_de: "Schweregrad"
+    options:
+      - value: "class_i"
+        label: "Class I - Mild"
+        label_de: "Klasse I - Leicht"
+        points: 0
+        description: "No limitation of physical activity"
+        description_de: "Keine Einschränkung der körperlichen Aktivität"
+      - value: "class_ii"
+        label: "Class II - Moderate"
+        label_de: "Klasse II - Mittel"
+        points: 1
+        description: "Slight limitation of physical activity"
+        description_de: "Leichte Einschränkung der körperlichen Aktivität"
+      - value: "class_iii"
+        label: "Class III - Severe"
+        label_de: "Klasse III - Schwer"
+        points: 2
+        description: "Marked limitation of physical activity"
+        description_de: "Deutliche Einschränkung der körperlichen Aktivität"
+    required: true
+
+  # Example 4: Number field with unit conversion (e.g., creatinine)
+  - field: "creatinine"
+    type: "number"
+    label: "Serum Creatinine"
+    label_de: "Serum-Kreatinin"
+    unit: "μmol/L"                  # Primary unit (German/metric)
+    unit_de: "μmol/L"
+    help: "Use μmol/L (SI units) or mg/dL will be converted"
+    help_de: "μmol/L (SI-Einheiten) verwenden, mg/dL wird umgerechnet"
+    min: 0
+    max: 1000
+    points:
+      - condition: "> 177"           # 177 μmol/L = 2.0 mg/dL
+        points: 1
+        label: "Elevated (>177 μmol/L / >2.0 mg/dL)"
+        label_de: "Erhöht (>177 μmol/L / >2.0 mg/dL)"
+    required: true
+
+# ==============================================================================
+# INTERPRETATION RULES (Required)
+# ==============================================================================
+# Map calculated scores to risk categories and recommendations
+
+interpretation:
+  # Low risk example
+  - score: 0                         # Can be exact number or range
+    risk: "Low Risk"
+    risk_de: "Niedriges Risiko"
+    risk_level: Low                  # For color coding: VeryLow, Low, Moderate, High, VeryHigh, Critical, None
+    recommendation: "No anticoagulation recommended. Consider aspirin."
+    recommendation_de: "Keine Antikoagulation empfohlen. Aspirin erwägen."
+    details: "Annual stroke risk <1%"
+    details_de: "Jährliches Schlaganfallrisiko <1%"
+
+  # Medium risk with range
+  - score: "1-2"                     # Range notation
+    risk: "Moderate Risk"
+    risk_de: "Mittleres Risiko"
+    risk_level: Moderate
+    recommendation: "Consider anticoagulation based on bleeding risk and patient preference."
+    recommendation_de: "Antikoagulation erwägen basierend auf Blutungsrisiko und Patientenpräferenz."
+    details: "Annual stroke risk 1-2%"
+    details_de: "Jährliches Schlaganfallrisiko 1-2%"
+
+  # High risk with >= notation
+  - score: "≥3"                      # Greater than or equal
+    risk: "High Risk"
+    risk_de: "Hohes Risiko"
+    risk_level: High
+    recommendation: "Anticoagulation recommended unless contraindicated."
+    recommendation_de: "Antikoagulation empfohlen, außer kontraindiziert."
+    details: "Annual stroke risk >3%"
+    details_de: "Jährliches Schlaganfallrisiko >3%"
+
+# ==============================================================================
+# OPTIONAL METADATA
+# ==============================================================================
+# Additional information for categorization and searchability
+
+metadata:
+  tags: "atrial fibrillation, stroke risk, anticoagulation"
+  category: "risk_stratification"
+  target_population: "Adults with atrial fibrillation"
+  keywords_de: "Vorhofflimmern, Schlaganfallrisiko, Antikoagulation"
+  doi: "10.1234/example.2024"
+  year: "2024"
+
+# ==============================================================================
+# NOTES FOR PHYSICIANS
+# ==============================================================================
+#
+# 1. Field types:
+#    - boolean: Yes/no checkbox (0 or 1 point typically)
+#    - number: Numeric input with optional min/max validation
+#    - dropdown: Selection from predefined options
+#
+# 2. Conditional points format:
+#    Conditions can use: >, >=, <, <=, ==, !=
+#    Examples: ">= 65", "< 50", "== 1"
+#    Order matters: conditions are evaluated top to bottom, first match wins
+#
+# 3. Risk levels for color coding:
+#    - VeryLow: Dark green (#4CAF50)
+#    - Low: Light green (#8BC34A)
+#    - Moderate: Yellow/amber (#FFC107)
+#    - High: Orange (#FF9800)
+#    - VeryHigh: Red (#F44336)
+#    - Critical: Dark red (#B71C1C)
+#    - None: Gray (for informational only)
+#
+# 4. Score ranges in interpretation:
+#    - Exact: 0, 1, 2
+#    - Range: "0-2", "3-5"
+#    - Comparison: "≥3", ">5", "<=2", "<10"
+#
+# 5. Units:
+#    - Always use metric/SI units as primary (μmol/L, mmol/L, kg, cm)
+#    - German clinical standard units
+#    - Conversions can be added in help text
+#
+# 6. References:
+#    - Always cite the source guideline or paper
+#    - Include page numbers for easy verification
+#    - Include DOI if available
+#
+# 7. Testing:
+#    - Find published example calculations in the guideline
+#    - Test your YAML with those examples to verify correctness
+#    - Document test cases in contribution pull request
+#
+# 8. Validation status:
+#    - "peer_reviewed": Published in peer-reviewed guideline
+#    - "draft": Work in progress
+#    - "community": Community-contributed, needs review
+#    - "experimental": Research or validation pending
