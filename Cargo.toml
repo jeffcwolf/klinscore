@@ -1,0 +1,100 @@
+[package]
+name = "klinscore"
+version = "0.1.0"
+edition = "2021"
+authors = ["J. Wolf"]
+description = "Open-source clinical score calculator for evidence-based medicine"
+repository = "https://github.com/yourusername/klinscore"
+license = "MIT OR Apache-2.0"
+keywords = ["medical", "clinical", "calculator", "healthcare", "fhir"]
+categories = ["science", "gui"]
+
+[dependencies]
+# GUI Framework
+iced = { version = "0.13", features = ["tokio", "debug"] }
+
+# YAML parsing for score definitions
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.9"
+serde_json = "1.0"
+
+# Date/time handling (for calculation history)
+chrono = { version = "0.4", features = ["serde"] }
+
+# Cross-platform directory management (for user data, scores)
+directories = "5.0"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# PDF generation (for exports)
+printpdf = "0.7"
+
+# CSV export
+csv = "1.3"
+
+# Logging (optional, useful for debugging)
+log = "0.4"
+env_logger = "0.11"
+
+# Internationalization (for German/English)
+fluent = "0.16"
+fluent-bundle = "0.15"
+unic-langid = "0.9"
+
+[dev-dependencies]
+# Testing
+pretty_assertions = "1.4"
+
+[profile.release]
+# Optimize for size and speed
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+# Faster compile times during development
+opt-level = 0
+
+[profile.dev.package."*"]
+# Optimize dependencies even in dev builds (faster app runtime)
+opt-level = 3
+
+# Platform-specific dependencies
+[target.'cfg(windows)'.dependencies]
+winres = "0.1"  # For Windows resource embedding (icon, metadata)
+
+[target.'cfg(target_os = "macos")'.dependencies]
+cocoa = "0.25"  # For macOS-specific features if needed
+
+# Metadata for binary
+[[bin]]
+name = "klinscore"
+path = "src/main.rs"
+
+# Package metadata for installers
+[package.metadata.bundle]
+name = "KlinScore"
+identifier = "org.klinscore.app"
+icon = ["assets/icon.icns", "assets/icon.ico", "assets/icon.png"]
+version = "0.1.0"
+resources = ["scores/", "assets/"]
+copyright = "Copyright (c) 2026 KlinScore Contributors"
+category = "Medical"
+short_description = "Clinical score calculator for evidence-based medicine"
+long_description = """
+KlinScore is an open-source clinical score calculator designed for physicians
+in German hospitals. It provides fast, offline calculation of evidence-based
+risk scores across multiple medical specialties (Cardiology, Nephrology,
+Anesthesiology, and more).
+
+Features:
+- Multi-specialty score calculator
+- German/European clinical guidelines (ESC, AWMF, KDIGO)
+- German + English interface
+- Offline-capable
+- Physician-maintainable score library
+- Export to PDF/CSV
+"""
