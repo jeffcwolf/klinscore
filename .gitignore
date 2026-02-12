@@ -1,0 +1,172 @@
+# KlinScore - Rust + Iced Desktop Application
+# .gitignore
+
+# Rust Build Artifacts
+/target/
+**/*.rs.bk
+*.pdb
+
+# Cargo.lock is committed for binaries, not libraries
+# Keep it for reproducible builds
+# Cargo.lock
+
+# Documentation Build
+/target/doc/
+/doc/
+
+# Testing
+*.profraw
+*.profdata
+
+# IDE / Editor Files
+# VSCode
+.vscode/
+*.code-workspace
+
+# IntelliJ / CLion / RustRover
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.swp
+.*.swo
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# OS Files
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# User Data & Settings
+# User preferences and app state
+user_settings.json
+app_state.json
+*.db
+*.sqlite
+*.sqlite3
+
+# User-created scores (keep example scores in repo)
+scores/user/
+scores/custom/
+scores/draft/
+
+# Calculation history and user data
+history/
+exports/
+*.pdf
+*.csv
+
+# Logs
+*.log
+logs/
+klinscore.log
+
+# Build Outputs
+# Executables
+klinscore
+klinscore.exe
+klinscore-*.exe
+klinscore-*.app
+klinscore-*.dmg
+klinscore-*.deb
+klinscore-*.rpm
+klinscore-*.AppImage
+
+# Installers
+installers/
+dist/
+release/
+*.msi
+*.pkg
+
+# Temporary Files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Backup Files
+*.bak
+*.backup
+*~
+
+# Test Coverage
+coverage/
+*.profraw
+*.gcda
+*.gcno
+tarpaulin-report.html
+cobertura.xml
+
+# Benchmarks
+criterion/
+benchmarks/
+
+# CI/CD
+.github/workflows/*.log
+
+# Documentation (keep markdown, ignore generated)
+book/
+mdbook-output/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# macOS Signing
+signing/
+certificates/
+*.p12
+*.mobileprovision
+
+# Windows Code Signing
+*.pfx
+
+# Development Database (if any)
+dev.db
+test.db
+
+# Example Outputs (don't commit generated examples)
+examples/output/
+screenshots/*.pdf
+
+# Keep These (Explicitly NOT Ignored)
+# Example scores that ship with the app
+!scores/cardiology/
+!scores/nephrology/
+!scores/anesthesiology/
+
+# Keep example YAML templates
+!scores/templates/
+!scores/examples/
+
+# Keep README files in ignored directories
+!**/README.md
+!**/.gitkeep
