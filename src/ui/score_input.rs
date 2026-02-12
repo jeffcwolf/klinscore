@@ -144,11 +144,9 @@ where
         Language::English => &field.label,
     };
 
-    let unit_text = field.unit.as_ref().and_then(|_| {
-        match language {
-            Language::German => field.unit_de.as_ref().or(field.unit.as_ref()),
-            Language::English => field.unit.as_ref(),
-        }
+    let unit_text = field.unit.as_ref().and_then(|_| match language {
+        Language::German => field.unit_de.as_ref().or(field.unit.as_ref()),
+        Language::English => field.unit.as_ref(),
     });
 
     let label_with_unit = if let Some(unit) = unit_text {
@@ -198,13 +196,10 @@ where
                 .padding(8)
                 .width(Length::Fixed(200.0));
 
-            column![
-                text(label_with_unit).size(16),
-                input,
-            ]
-            .spacing(5)
-            .padding(10)
-            .into()
+            column![text(label_with_unit).size(16), input,]
+                .spacing(5)
+                .padding(10)
+                .into()
         }
 
         InputType::Dropdown => {

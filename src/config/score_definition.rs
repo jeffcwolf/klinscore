@@ -287,13 +287,13 @@ impl RiskLevel {
     #[allow(dead_code)]
     pub fn color(&self) -> &'static str {
         match self {
-            RiskLevel::VeryLow => "#4CAF50",    // Green
-            RiskLevel::Low => "#8BC34A",        // Light green
-            RiskLevel::Moderate => "#FFC107",   // Yellow/amber
-            RiskLevel::High => "#FF9800",       // Orange
-            RiskLevel::VeryHigh => "#F44336",   // Red
-            RiskLevel::Critical => "#B71C1C",   // Dark red
-            RiskLevel::None => "#9E9E9E",       // Gray
+            RiskLevel::VeryLow => "#4CAF50",  // Green
+            RiskLevel::Low => "#8BC34A",      // Light green
+            RiskLevel::Moderate => "#FFC107", // Yellow/amber
+            RiskLevel::High => "#FF9800",     // Orange
+            RiskLevel::VeryHigh => "#F44336", // Red
+            RiskLevel::Critical => "#B71C1C", // Dark red
+            RiskLevel::None => "#9E9E9E",     // Gray
         }
     }
 

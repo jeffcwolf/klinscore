@@ -18,10 +18,7 @@ fn main() {
                     println!("  • {} ({})", score.name, score.name_de);
                     println!("    Source: {}", score.guideline_source);
                     println!("    Inputs: {}", score.inputs.len());
-                    println!(
-                        "    Risk categories: {}",
-                        score.interpretation.len()
-                    );
+                    println!("    Risk categories: {}", score.interpretation.len());
                     println!();
                 }
             }

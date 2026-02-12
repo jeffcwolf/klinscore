@@ -59,11 +59,7 @@ impl ScoreLibrary {
     pub fn get_scores_for_specialty(&self, specialty: Specialty) -> Vec<&ScoreDefinition> {
         self.by_specialty
             .get(&specialty)
-            .map(|ids| {
-                ids.iter()
-                    .filter_map(|id| self.scores.get(id))
-                    .collect()
-            })
+            .map(|ids| ids.iter().filter_map(|id| self.scores.get(id)).collect())
             .unwrap_or_default()
     }
 

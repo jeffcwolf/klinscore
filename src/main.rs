@@ -11,10 +11,25 @@ use scores::{calculate_score, load_all_scores, CalculationResult, ScoreLibrary};
 use settings::{AppTheme, Settings};
 use ui::{InputMessage, Language, ScoreInputState};
 
+use chrono::Local;
 use iced::{
-    widget::{button, column, container, pick_list, row, scrollable, text},
+    widget::{button, column, container, horizontal_rule, pick_list, row, scrollable, text},
     Alignment, Element, Length, Task,
 };
+
+/// A single calculation history entry
+#[derive(Debug, Clone)]
+struct HistoryEntry {
+    score_name: String,
+    score_name_de: String,
+    #[allow(dead_code)]
+    score_id: String,
+    specialty: Specialty,
+    total_score: i32,
+    risk: String,
+    risk_de: String,
+    timestamp: String,
+}
 
 fn main() -> iced::Result {
     iced::application("KlinScore", KlinScore::update, KlinScore::view)
@@ -39,6 +54,8 @@ enum AppState {
         result: Option<CalculationResult>,
         error: Option<String>,
     },
+    History,
+    About,
     Settings,
     Error(String),
 }
@@ -49,6 +66,9 @@ struct KlinScore {
     language: Language,
     score_library: Option<ScoreLibrary>,
     settings: Settings,
+    history: Vec<HistoryEntry>,
+    /// Tracks the previous state to return to from About/History
+    previous_state: Option<Box<AppState>>,
 }
 
 // Messages (user interactions)
@@ -65,6 +85,11 @@ enum Message {
     OpenSettings,
     CloseSettings,
     ThemeChanged(AppTheme),
+    OpenHistory,
+    CloseHistory,
+    ClearHistory,
+    OpenAbout,
+    CloseAbout,
 }
 
 impl KlinScore {
@@ -74,6 +99,8 @@ impl KlinScore {
             language: Language::German,
             score_library: None,
             settings: Settings::new(),
+            history: Vec::new(),
+            previous_state: None,
         };
 
         // Load scores asynchronously
@@ -98,17 +125,15 @@ impl KlinScore {
                     Language::English => Language::German,
                 };
             }
-            Message::ScoresLoaded(result) => {
-                match result {
-                    Ok(library) => {
-                        self.score_library = Some(library);
-                        self.state = AppState::Welcome;
-                    }
-                    Err(e) => {
-                        self.state = AppState::Error(e);
-                    }
+            Message::ScoresLoaded(result) => match result {
+                Ok(library) => {
+                    self.score_library = Some(library);
+                    self.state = AppState::Welcome;
                 }
-            }
+                Err(e) => {
+                    self.state = AppState::Error(e);
+                }
+            },
             Message::SpecialtySelected(specialty) => {
                 self.state = AppState::ScoreSelection { specialty };
             }
@@ -125,11 +150,11 @@ impl KlinScore {
             }
             Message::Input(input_msg) => {
                 if let AppState::ScoreCalculation {
+                    specialty,
                     ref score_id,
                     ref mut input_state,
                     ref mut result,
                     ref mut error,
-                    ..
                 } = self.state
                 {
                     match input_msg {
@@ -154,6 +179,21 @@ impl KlinScore {
                                 if let Some(score_def) = library.get_score(score_id) {
                                     match calculate_score(score_def, &input_state.inputs) {
                                         Ok(calc_result) => {
+                                            // Save to history
+                                            let entry = HistoryEntry {
+                                                score_name: score_def.name.clone(),
+                                                score_name_de: score_def.name_de.clone(),
+                                                score_id: score_id.clone(),
+                                                specialty,
+                                                total_score: calc_result.total_score,
+                                                risk: calc_result.risk.clone(),
+                                                risk_de: calc_result.risk_de.clone(),
+                                                timestamp: Local::now()
+                                                    .format("%Y-%m-%d %H:%M")
+                                                    .to_string(),
+                                            };
+                                            self.history.push(entry);
+
                                             *result = Some(calc_result);
                                             *error = None;
                                         }
@@ -193,6 +233,31 @@ impl KlinScore {
             Message::ThemeChanged(theme) => {
                 self.settings.theme = theme;
             }
+            Message::OpenHistory => {
+                self.previous_state = Some(Box::new(self.state.clone()));
+                self.state = AppState::History;
+            }
+            Message::CloseHistory => {
+                self.state = self
+                    .previous_state
+                    .take()
+                    .map(|s| *s)
+                    .unwrap_or(AppState::Welcome);
+            }
+            Message::ClearHistory => {
+                self.history.clear();
+            }
+            Message::OpenAbout => {
+                self.previous_state = Some(Box::new(self.state.clone()));
+                self.state = AppState::About;
+            }
+            Message::CloseAbout => {
+                self.state = self
+                    .previous_state
+                    .take()
+                    .map(|s| *s)
+                    .unwrap_or(AppState::Welcome);
+            }
         }
         Task::none()
     }
@@ -211,9 +276,26 @@ impl KlinScore {
             .on_press(Message::LanguageToggled)
             .padding(10);
 
+        let history_label = match self.language {
+            Language::German => "Verlauf",
+            Language::English => "History",
+        };
+
+        let history_count = if self.history.is_empty() {
+            String::new()
+        } else {
+            format!(" ({})", self.history.len())
+        };
+
+        let history_button = button(text(format!("{}{}", history_label, history_count)))
+            .on_press(Message::OpenHistory)
+            .padding(10);
+
+        let about_button = button(text("?")).on_press(Message::OpenAbout).padding(10);
+
         let settings_label = match self.language {
-            Language::German => "⚙️ Einstellungen",
-            Language::English => "⚙️ Settings",
+            Language::German => "Einstellungen",
+            Language::English => "Settings",
         };
 
         let settings_button = button(text(settings_label))
@@ -221,9 +303,9 @@ impl KlinScore {
             .padding(10);
 
         let header = row![
-            text("KlinScore")
-                .size(32)
-                .width(Length::Fill),
+            text("KlinScore").size(32).width(Length::Fill),
+            history_button,
+            about_button,
             settings_button,
             language_button
         ]
@@ -242,7 +324,15 @@ impl KlinScore {
                 input_state,
                 result,
                 error,
-            } => self.calculation_view(*specialty, score_id, input_state, result.as_ref(), error.as_deref()),
+            } => self.calculation_view(
+                *specialty,
+                score_id,
+                input_state,
+                result.as_ref(),
+                error.as_deref(),
+            ),
+            AppState::History => self.history_view(),
+            AppState::About => self.about_view(),
             AppState::Settings => self.settings_view(),
             AppState::Error(error) => self.error_view(error),
         };
@@ -285,9 +375,7 @@ impl KlinScore {
         };
 
         let subtitle = match self.language {
-            Language::German => {
-                "Quelloffener klinischer Score-Rechner für evidenzbasierte Medizin"
-            }
+            Language::German => "Quelloffener klinischer Score-Rechner für evidenzbasierte Medizin",
             Language::English => {
                 "Open-source clinical score calculator for evidence-based medicine"
             }
@@ -382,11 +470,8 @@ impl KlinScore {
                             .unwrap_or_default();
 
                         button(
-                            column![
-                                text(label).size(20),
-                                text(&score.guideline_source).size(14)
-                            ]
-                            .spacing(5),
+                            column![text(label).size(20), text(&score.guideline_source).size(14)]
+                                .spacing(5),
                         )
                         .on_press(Message::ScoreSelected(score_id))
                         .padding(15)
@@ -466,19 +551,19 @@ impl KlinScore {
                     let error_box = container(
                         text(format!("{}{}", error_label, err))
                             .size(16)
-                            .color(iced::Color::from_rgb(0.8, 0.1, 0.1))
+                            .color(iced::Color::from_rgb(0.8, 0.1, 0.1)),
                     )
                     .padding(10)
-                    .style(|_theme: &iced::Theme| {
-                        container::Style {
-                            background: Some(iced::Background::Color(iced::Color::from_rgb(1.0, 0.9, 0.9))),
-                            border: iced::Border {
-                                color: iced::Color::from_rgb(0.8, 0.1, 0.1),
-                                width: 2.0,
-                                radius: 5.0.into(),
-                            },
-                            ..Default::default()
-                        }
+                    .style(|_theme: &iced::Theme| container::Style {
+                        background: Some(iced::Background::Color(iced::Color::from_rgb(
+                            1.0, 0.9, 0.9,
+                        ))),
+                        border: iced::Border {
+                            color: iced::Color::from_rgb(0.8, 0.1, 0.1),
+                            width: 2.0,
+                            radius: 5.0.into(),
+                        },
+                        ..Default::default()
                     });
                     content.push(error_box.into());
                 }
@@ -487,7 +572,7 @@ impl KlinScore {
                     button(text(back_label).size(18))
                         .on_press(Message::BackToScoreSelection)
                         .padding(10)
-                        .into()
+                        .into(),
                 );
 
                 column(content)
@@ -497,6 +582,344 @@ impl KlinScore {
             }
         } else {
             text("Score not found").into()
+        }
+    }
+
+    fn history_view(&self) -> Element<'_, Message> {
+        let title = match self.language {
+            Language::German => "Berechnungsverlauf",
+            Language::English => "Calculation History",
+        };
+
+        let back_label = match self.language {
+            Language::German => "← Zurück",
+            Language::English => "← Back",
+        };
+
+        let mut content_widgets: Vec<Element<'_, Message>> = vec![text(title).size(32).into()];
+
+        if self.history.is_empty() {
+            let empty_msg = match self.language {
+                Language::German => "Noch keine Berechnungen durchgeführt.",
+                Language::English => "No calculations yet.",
+            };
+            content_widgets.push(text(empty_msg).size(16).into());
+        } else {
+            let clear_label = match self.language {
+                Language::German => "Verlauf löschen",
+                Language::English => "Clear History",
+            };
+
+            content_widgets.push(
+                row![
+                    text(format!(
+                        "{} {}",
+                        self.history.len(),
+                        match self.language {
+                            Language::German => "Berechnungen",
+                            Language::English => "calculations",
+                        }
+                    ))
+                    .size(14)
+                    .width(Length::Fill),
+                    button(text(clear_label).size(14))
+                        .on_press(Message::ClearHistory)
+                        .padding(8),
+                ]
+                .align_y(Alignment::Center)
+                .into(),
+            );
+
+            content_widgets.push(horizontal_rule(1).into());
+
+            // Show history entries in reverse chronological order
+            for entry in self.history.iter().rev() {
+                let score_name = match self.language {
+                    Language::German => &entry.score_name_de,
+                    Language::English => &entry.score_name,
+                };
+
+                let risk_text = match self.language {
+                    Language::German => &entry.risk_de,
+                    Language::English => &entry.risk,
+                };
+
+                let specialty_text = match self.language {
+                    Language::German => entry.specialty.to_german(),
+                    Language::English => entry.specialty.to_english(),
+                };
+
+                let entry_widget = container(
+                    column![
+                        row![
+                            text(score_name).size(18).width(Length::Fill),
+                            text(&entry.timestamp).size(12),
+                        ]
+                        .align_y(Alignment::Center),
+                        row![
+                            text(format!(
+                                "{}: {}",
+                                match self.language {
+                                    Language::German => "Score",
+                                    Language::English => "Score",
+                                },
+                                entry.total_score
+                            ))
+                            .size(14),
+                            text(" | ").size(14),
+                            text(risk_text).size(14),
+                            text(" | ").size(14),
+                            text(specialty_text).size(12),
+                        ]
+                        .spacing(5),
+                    ]
+                    .spacing(5),
+                )
+                .padding(12)
+                .width(Length::Fill)
+                .style(|theme: &iced::Theme| {
+                    let palette = theme.palette();
+                    container::Style {
+                        background: Some(iced::Background::Color(iced::Color {
+                            a: 0.05,
+                            ..palette.text
+                        })),
+                        border: iced::Border {
+                            color: iced::Color {
+                                a: 0.15,
+                                ..palette.text
+                            },
+                            width: 1.0,
+                            radius: 6.0.into(),
+                        },
+                        ..Default::default()
+                    }
+                });
+
+                content_widgets.push(entry_widget.into());
+            }
+        }
+
+        content_widgets.push(
+            button(text(back_label).size(18))
+                .on_press(Message::CloseHistory)
+                .padding(10)
+                .into(),
+        );
+
+        let content = column(content_widgets)
+            .spacing(15)
+            .align_x(Alignment::Center)
+            .padding(40)
+            .max_width(700);
+
+        container(content)
+            .width(Length::Fill)
+            .center_x(Length::Fill)
+            .into()
+    }
+
+    fn about_view(&self) -> Element<'_, Message> {
+        let back_label = match self.language {
+            Language::German => "← Zurück",
+            Language::English => "← Back",
+        };
+
+        let scores_count = self
+            .score_library
+            .as_ref()
+            .map(|lib| lib.count())
+            .unwrap_or(0);
+
+        let (
+            title,
+            subtitle,
+            version_label,
+            scores_label,
+            specialties_label,
+            guidelines_label,
+            features_title,
+            features,
+            license_label,
+            source_label,
+            disclaimer_title,
+            disclaimer_text,
+        ) = match self.language {
+            Language::German => (
+                "Über KlinScore",
+                "Quelloffener klinischer Score-Rechner für evidenzbasierte Medizin",
+                "Version",
+                "Scores geladen",
+                "Fachgebiete: Kardiologie, Nephrologie, Anästhesiologie",
+                "Leitlinien: ESC 2024, KDIGO, ACCP, ASA",
+                "Funktionen",
+                vec![
+                    "Mehrere Fachgebiete mit validierten klinischen Scores",
+                    "Deutsch/Englisch-Sprachunterstützung",
+                    "Offline-fähig — keine Internetverbindung erforderlich",
+                    "YAML-basierte Score-Definitionen — von Ärzten erweiterbar",
+                    "Farbcodierte Risikovisualisierung",
+                    "Detaillierte Punkteaufschlüsselung pro Berechnung",
+                    "Berechnungsverlauf innerhalb der Sitzung",
+                ],
+                "Lizenz: MIT / Apache 2.0",
+                "Quellcode",
+                "Haftungsausschluss",
+                "KlinScore ist ein Hilfsmittel zur klinischen Entscheidungsunterstützung. \
+                 Es ersetzt nicht die klinische Beurteilung durch einen Arzt. \
+                 Alle Scores sollten im klinischen Kontext des Patienten interpretiert werden. \
+                 Keine Garantie für Richtigkeit oder Vollständigkeit.",
+            ),
+            Language::English => (
+                "About KlinScore",
+                "Open-source clinical score calculator for evidence-based medicine",
+                "Version",
+                "Scores loaded",
+                "Specialties: Cardiology, Nephrology, Anesthesiology",
+                "Guidelines: ESC 2024, KDIGO, ACCP, ASA",
+                "Features",
+                vec![
+                    "Multiple specialties with validated clinical scores",
+                    "German/English language support",
+                    "Offline-capable — no internet connection required",
+                    "YAML-based score definitions — extensible by physicians",
+                    "Color-coded risk visualization",
+                    "Detailed points breakdown per calculation",
+                    "In-session calculation history",
+                ],
+                "License: MIT / Apache 2.0",
+                "Source code",
+                "Disclaimer",
+                "KlinScore is a clinical decision support tool. \
+                 It does not replace clinical judgment by a physician. \
+                 All scores should be interpreted in the patient's clinical context. \
+                 No guarantee of accuracy or completeness.",
+            ),
+        };
+
+        let feature_items: Vec<Element<'_, Message>> = features
+            .into_iter()
+            .map(|f| text(format!("  • {}", f)).size(14).into())
+            .collect();
+
+        let content = column![
+            text(title).size(32),
+            text(subtitle).size(16),
+            horizontal_rule(1),
+            // Version and stats
+            column![
+                text(format!("{}: 0.1.0", version_label)).size(14),
+                text(format!("{}: {}", scores_label, scores_count)).size(14),
+                text(specialties_label).size(14),
+                text(guidelines_label).size(14),
+                text(license_label).size(14),
+                text(format!(
+                    "{}: github.com/yourusername/klinscore",
+                    source_label
+                ))
+                .size(14),
+            ]
+            .spacing(5)
+            .padding(10),
+            horizontal_rule(1),
+            // Features
+            column![
+                text(features_title).size(20),
+                column(feature_items).spacing(4),
+            ]
+            .spacing(8)
+            .padding(10),
+            horizontal_rule(1),
+            // Disclaimer
+            container(
+                column![
+                    text(disclaimer_title).size(16),
+                    text(disclaimer_text).size(13),
+                ]
+                .spacing(5),
+            )
+            .padding(15)
+            .style(|theme: &iced::Theme| {
+                let palette = theme.palette();
+                container::Style {
+                    background: Some(iced::Background::Color(iced::Color {
+                        a: 0.08,
+                        ..palette.danger
+                    })),
+                    border: iced::Border {
+                        color: iced::Color {
+                            a: 0.3,
+                            ..palette.danger
+                        },
+                        width: 1.0,
+                        radius: 6.0.into(),
+                    },
+                    ..Default::default()
+                }
+            }),
+            // Available scores section
+            self.about_scores_section(),
+            // Back button
+            button(text(back_label).size(18))
+                .on_press(Message::CloseAbout)
+                .padding(10),
+        ]
+        .spacing(15)
+        .align_x(Alignment::Center)
+        .padding(40)
+        .max_width(700);
+
+        container(content)
+            .width(Length::Fill)
+            .center_x(Length::Fill)
+            .into()
+    }
+
+    fn about_scores_section(&self) -> Element<'_, Message> {
+        let title = match self.language {
+            Language::German => "Verfügbare Scores",
+            Language::English => "Available Scores",
+        };
+
+        if let Some(library) = &self.score_library {
+            let mut score_items: Vec<Element<'_, Message>> = Vec::new();
+
+            for specialty in &[
+                Specialty::Cardiology,
+                Specialty::Nephrology,
+                Specialty::Anesthesiology,
+            ] {
+                let scores = library.get_scores_for_specialty(*specialty);
+                if scores.is_empty() {
+                    continue;
+                }
+
+                let specialty_name = match self.language {
+                    Language::German => specialty.to_german(),
+                    Language::English => specialty.to_english(),
+                };
+
+                score_items.push(text(specialty_name).size(16).into());
+
+                for score in &scores {
+                    let name = match self.language {
+                        Language::German => &score.name_de,
+                        Language::English => &score.name,
+                    };
+                    score_items.push(
+                        text(format!("    • {} ({})", name, score.guideline_source))
+                            .size(13)
+                            .into(),
+                    );
+                }
+            }
+
+            column![text(title).size(20), column(score_items).spacing(4),]
+                .spacing(8)
+                .padding(10)
+                .into()
+        } else {
+            text("").into()
         }
     }
 

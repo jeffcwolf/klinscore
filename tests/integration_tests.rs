@@ -50,7 +50,11 @@ fn test_score_library_methods() {
     assert_eq!(nephro_scores.len(), 2, "Should have 2 nephrology scores");
 
     let anesth_scores = library.get_scores_for_specialty(Specialty::Anesthesiology);
-    assert_eq!(anesth_scores.len(), 4, "Should have 4 anesthesiology scores");
+    assert_eq!(
+        anesth_scores.len(),
+        4,
+        "Should have 4 anesthesiology scores"
+    );
 
     assert!(library.get_score("cha2ds2_va").is_some());
     assert!(library.get_score("has_bled").is_some());
@@ -143,8 +147,8 @@ fn test_cha2ds2va_age_boundaries() {
         let result = calculate_score(score, &inputs)
             .unwrap_or_else(|e| panic!("Calculation failed for age {}: {}", age, e));
         assert_eq!(
-            result.field_points.get("age"),
-            Some(&expected_points),
+            result.get_field_points("age"),
+            Some(expected_points),
             "Wrong points for age {}",
             age
         );
@@ -187,7 +191,10 @@ fn test_has_bled_high_risk() {
 
     let mut inputs = HashMap::new();
     inputs.insert("hypertension".to_string(), InputValue::Boolean(true));
-    inputs.insert("abnormal_renal_function".to_string(), InputValue::Boolean(true));
+    inputs.insert(
+        "abnormal_renal_function".to_string(),
+        InputValue::Boolean(true),
+    );
     inputs.insert("stroke".to_string(), InputValue::Boolean(true));
     inputs.insert("elderly".to_string(), InputValue::Boolean(true));
 
@@ -314,13 +321,13 @@ fn test_grace_compound_conditions() {
     );
 
     let result = calculate_score(score, &inputs).unwrap();
-    assert_eq!(result.field_points.get("age"), Some(&8));
+    assert_eq!(result.get_field_points("age"), Some(8));
 
     // Age 55 should match ">= 50 && < 60" = 41 points
     let mut inputs2 = inputs.clone();
     inputs2.insert("age".to_string(), InputValue::Number(55.0));
     let result2 = calculate_score(score, &inputs2).unwrap();
-    assert_eq!(result2.field_points.get("age"), Some(&41));
+    assert_eq!(result2.get_field_points("age"), Some(41));
 }
 
 #[test]
@@ -422,7 +429,10 @@ fn test_rcri_two_risk_factors() {
 
     let mut inputs = HashMap::new();
     inputs.insert("high_risk_surgery".to_string(), InputValue::Boolean(true));
-    inputs.insert("ischemic_heart_disease".to_string(), InputValue::Boolean(true));
+    inputs.insert(
+        "ischemic_heart_disease".to_string(),
+        InputValue::Boolean(true),
+    );
 
     let result = calculate_score(score, &inputs).unwrap();
     assert_eq!(result.total_score, 2);
@@ -436,9 +446,15 @@ fn test_rcri_max_score() {
 
     let mut inputs = HashMap::new();
     inputs.insert("high_risk_surgery".to_string(), InputValue::Boolean(true));
-    inputs.insert("ischemic_heart_disease".to_string(), InputValue::Boolean(true));
+    inputs.insert(
+        "ischemic_heart_disease".to_string(),
+        InputValue::Boolean(true),
+    );
     inputs.insert("heart_failure".to_string(), InputValue::Boolean(true));
-    inputs.insert("cerebrovascular_disease".to_string(), InputValue::Boolean(true));
+    inputs.insert(
+        "cerebrovascular_disease".to_string(),
+        InputValue::Boolean(true),
+    );
     inputs.insert("diabetes_insulin".to_string(), InputValue::Boolean(true));
     inputs.insert("renal_insufficiency".to_string(), InputValue::Boolean(true));
 
@@ -580,7 +596,11 @@ fn test_egfr_loads_with_sex_dropdown() {
         klinscore::config::InputType::Dropdown,
         "Sex should be a dropdown"
     );
-    assert_eq!(sex_field.options.len(), 2, "Should have male and female options");
+    assert_eq!(
+        sex_field.options.len(),
+        2,
+        "Should have male and female options"
+    );
 }
 
 #[test]
@@ -655,7 +675,10 @@ fn test_kfre_calculation() {
 
     let mut inputs = HashMap::new();
     inputs.insert("age".to_string(), InputValue::Number(65.0));
-    inputs.insert("sex".to_string(), InputValue::Dropdown("female".to_string()));
+    inputs.insert(
+        "sex".to_string(),
+        InputValue::Dropdown("female".to_string()),
+    );
     inputs.insert("egfr".to_string(), InputValue::Number(35.0));
     inputs.insert("acr".to_string(), InputValue::Number(30.0));
 

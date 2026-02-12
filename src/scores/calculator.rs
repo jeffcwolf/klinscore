@@ -66,14 +66,23 @@ impl InputValue {
     }
 }
 
+/// Points breakdown for a single field
+#[derive(Debug, Clone, PartialEq)]
+pub struct FieldScore {
+    pub field: String,
+    pub label: String,
+    pub label_de: String,
+    pub points: i32,
+}
+
 /// Result of a score calculation
 #[derive(Debug, Clone, PartialEq)]
 pub struct CalculationResult {
     /// Total calculated score
     pub total_score: i32,
 
-    /// Breakdown of points by field
-    pub field_points: HashMap<String, i32>,
+    /// Ordered breakdown of points by field (preserves YAML definition order)
+    pub field_scores: Vec<FieldScore>,
 
     /// Matched interpretation rule
     pub interpretation: InterpretationRule,
@@ -98,6 +107,16 @@ pub struct CalculationResult {
 
     /// Optional details (German)
     pub details_de: Option<String>,
+}
+
+impl CalculationResult {
+    /// Get points for a field by name (for testing)
+    pub fn get_field_points(&self, field_name: &str) -> Option<i32> {
+        self.field_scores
+            .iter()
+            .find(|fs| fs.field == field_name)
+            .map(|fs| fs.points)
+    }
 }
 
 /// Calculate a score based on user inputs
@@ -131,7 +150,7 @@ pub fn calculate_score(
     inputs: &HashMap<String, InputValue>,
 ) -> Result<CalculationResult, CalculationError> {
     let mut total_score = 0;
-    let mut field_points = HashMap::new();
+    let mut field_scores = Vec::new();
 
     // Calculate points for each input field
     for input_field in &score_def.inputs {
@@ -144,15 +163,18 @@ pub fn calculate_score(
             });
         }
 
-        // Get input value (skip if not provided and not required)
-        let input_value = match inputs.get(field_name) {
-            Some(v) => v,
-            None => continue,
+        // Get input value
+        let points = match inputs.get(field_name) {
+            Some(input_value) => calculate_field_points(input_field, input_value)?,
+            None => 0, // Field not provided (e.g., unchecked boolean) = 0 points
         };
 
-        // Calculate points for this field
-        let points = calculate_field_points(input_field, input_value)?;
-        field_points.insert(field_name.clone(), points);
+        field_scores.push(FieldScore {
+            field: field_name.clone(),
+            label: input_field.label.clone(),
+            label_de: input_field.label_de.clone(),
+            points,
+        });
         total_score += points;
     }
 
@@ -161,7 +183,7 @@ pub fn calculate_score(
 
     Ok(CalculationResult {
         total_score,
-        field_points,
+        field_scores,
         risk_level: interpretation.risk_level,
         risk: interpretation.risk.clone(),
         risk_de: interpretation.risk_de.clone(),
@@ -190,12 +212,12 @@ fn calculate_boolean_points(
     input_field: &InputField,
     input_value: &InputValue,
 ) -> Result<i32, CalculationError> {
-    let value = input_value.as_bool().ok_or_else(|| {
-        CalculationError::InvalidInput {
+    let value = input_value
+        .as_bool()
+        .ok_or_else(|| CalculationError::InvalidInput {
             field: input_field.field.clone(),
             reason: "Expected boolean value".to_string(),
-        }
-    })?;
+        })?;
 
     if value {
         match &input_field.points {
@@ -215,12 +237,12 @@ fn calculate_number_points(
     input_field: &InputField,
     input_value: &InputValue,
 ) -> Result<i32, CalculationError> {
-    let value = input_value.as_number().ok_or_else(|| {
-        CalculationError::InvalidInput {
+    let value = input_value
+        .as_number()
+        .ok_or_else(|| CalculationError::InvalidInput {
             field: input_field.field.clone(),
             reason: "Expected numeric value".to_string(),
-        }
-    })?;
+        })?;
 
     // Validate range if specified
     if let Some(min) = input_field.min {
@@ -257,12 +279,12 @@ fn calculate_dropdown_points(
     input_field: &InputField,
     input_value: &InputValue,
 ) -> Result<i32, CalculationError> {
-    let selected = input_value.as_string().ok_or_else(|| {
-        CalculationError::InvalidInput {
+    let selected = input_value
+        .as_string()
+        .ok_or_else(|| CalculationError::InvalidInput {
             field: input_field.field.clone(),
             reason: "Expected dropdown/string value".to_string(),
-        }
-    })?;
+        })?;
 
     // Find the matching option
     let option = input_field
@@ -278,10 +300,7 @@ fn calculate_dropdown_points(
 }
 
 /// Evaluate conditional point rules
-fn evaluate_conditions(
-    conditions: &[PointCondition],
-    value: f64,
-) -> Result<i32, CalculationError> {
+fn evaluate_conditions(conditions: &[PointCondition], value: f64) -> Result<i32, CalculationError> {
     // Evaluate conditions in order, return first match
     for condition in conditions {
         if evaluate_condition(&condition.condition, value)? {
@@ -316,52 +335,64 @@ fn evaluate_single_condition(condition: &str, value: f64) -> Result<bool, Calcul
     let condition = condition.trim();
 
     if let Some(threshold_str) = condition.strip_prefix(">=") {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '>='".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '>='".to_string(),
+                })?;
         Ok(value >= threshold)
     } else if let Some(threshold_str) = condition.strip_prefix("<=") {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '<='".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '<='".to_string(),
+                })?;
         Ok(value <= threshold)
     } else if let Some(threshold_str) = condition.strip_prefix('>') {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '>'".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '>'".to_string(),
+                })?;
         Ok(value > threshold)
     } else if let Some(threshold_str) = condition.strip_prefix('<') {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '<'".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '<'".to_string(),
+                })?;
         Ok(value < threshold)
     } else if let Some(threshold_str) = condition.strip_prefix("==") {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '=='".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '=='".to_string(),
+                })?;
         Ok((value - threshold).abs() < f64::EPSILON)
     } else if let Some(threshold_str) = condition.strip_prefix("!=") {
-        let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
-            CalculationError::ConditionParseError {
-                condition: condition.to_string(),
-                reason: "Invalid number after '!='".to_string(),
-            }
-        })?;
+        let threshold: f64 =
+            threshold_str
+                .trim()
+                .parse()
+                .map_err(|_| CalculationError::ConditionParseError {
+                    condition: condition.to_string(),
+                    reason: "Invalid number after '!='".to_string(),
+                })?;
         Ok((value - threshold).abs() >= f64::EPSILON)
     } else {
         Err(CalculationError::ConditionParseError {
@@ -418,12 +449,13 @@ fn matches_score_range(range: &ScoreRange, score: i32) -> Result<bool, Calculati
                     .trim_start_matches("≥")
                     .trim_start_matches(">=")
                     .trim();
-                let threshold: i32 = threshold_str.parse().map_err(|_| {
-                    CalculationError::ConditionParseError {
-                        condition: range_str.to_string(),
-                        reason: "Invalid number in range".to_string(),
-                    }
-                })?;
+                let threshold: i32 =
+                    threshold_str
+                        .parse()
+                        .map_err(|_| CalculationError::ConditionParseError {
+                            condition: range_str.to_string(),
+                            reason: "Invalid number in range".to_string(),
+                        })?;
                 return Ok(score >= threshold);
             }
 
@@ -432,34 +464,37 @@ fn matches_score_range(range: &ScoreRange, score: i32) -> Result<bool, Calculati
                     .trim_start_matches("≤")
                     .trim_start_matches("<=")
                     .trim();
-                let threshold: i32 = threshold_str.parse().map_err(|_| {
-                    CalculationError::ConditionParseError {
-                        condition: range_str.to_string(),
-                        reason: "Invalid number in range".to_string(),
-                    }
-                })?;
+                let threshold: i32 =
+                    threshold_str
+                        .parse()
+                        .map_err(|_| CalculationError::ConditionParseError {
+                            condition: range_str.to_string(),
+                            reason: "Invalid number in range".to_string(),
+                        })?;
                 return Ok(score <= threshold);
             }
 
             if range_str.starts_with('>') && !range_str.starts_with(">=") {
                 let threshold_str = range_str.trim_start_matches('>').trim();
-                let threshold: i32 = threshold_str.parse().map_err(|_| {
-                    CalculationError::ConditionParseError {
-                        condition: range_str.to_string(),
-                        reason: "Invalid number in range".to_string(),
-                    }
-                })?;
+                let threshold: i32 =
+                    threshold_str
+                        .parse()
+                        .map_err(|_| CalculationError::ConditionParseError {
+                            condition: range_str.to_string(),
+                            reason: "Invalid number in range".to_string(),
+                        })?;
                 return Ok(score > threshold);
             }
 
             if range_str.starts_with('<') && !range_str.starts_with("<=") {
                 let threshold_str = range_str.trim_start_matches('<').trim();
-                let threshold: i32 = threshold_str.parse().map_err(|_| {
-                    CalculationError::ConditionParseError {
-                        condition: range_str.to_string(),
-                        reason: "Invalid number in range".to_string(),
-                    }
-                })?;
+                let threshold: i32 =
+                    threshold_str
+                        .parse()
+                        .map_err(|_| CalculationError::ConditionParseError {
+                            condition: range_str.to_string(),
+                            reason: "Invalid number in range".to_string(),
+                        })?;
                 return Ok(score < threshold);
             }
 
@@ -575,8 +610,8 @@ mod tests {
 
         assert_eq!(result.total_score, 2); // 1 for age 65-74, 1 for hypertension
         assert_eq!(result.risk, "High");
-        assert_eq!(result.field_points.get("age"), Some(&1));
-        assert_eq!(result.field_points.get("hypertension"), Some(&1));
+        assert_eq!(result.get_field_points("age"), Some(1));
+        assert_eq!(result.get_field_points("hypertension"), Some(1));
     }
 
     #[test]
@@ -588,21 +623,21 @@ mod tests {
         inputs.insert("age".to_string(), InputValue::Number(80.0));
         inputs.insert("hypertension".to_string(), InputValue::Boolean(false));
         let result = calculate_score(&score_def, &inputs).unwrap();
-        assert_eq!(result.field_points.get("age"), Some(&2));
+        assert_eq!(result.get_field_points("age"), Some(2));
 
         // Age 70 (65-74) = 1 point
         let mut inputs = HashMap::new();
         inputs.insert("age".to_string(), InputValue::Number(70.0));
         inputs.insert("hypertension".to_string(), InputValue::Boolean(false));
         let result = calculate_score(&score_def, &inputs).unwrap();
-        assert_eq!(result.field_points.get("age"), Some(&1));
+        assert_eq!(result.get_field_points("age"), Some(1));
 
         // Age 60 (<65) = 0 points
         let mut inputs = HashMap::new();
         inputs.insert("age".to_string(), InputValue::Number(60.0));
         inputs.insert("hypertension".to_string(), InputValue::Boolean(false));
         let result = calculate_score(&score_def, &inputs).unwrap();
-        assert_eq!(result.field_points.get("age"), Some(&0));
+        assert_eq!(result.get_field_points("age"), Some(0));
     }
 
     #[test]
@@ -724,9 +759,12 @@ mod tests {
         let mut inputs = HashMap::new();
         inputs.insert("age".to_string(), InputValue::Number(60.0));
         inputs.insert("hypertension".to_string(), InputValue::Boolean(false));
-        inputs.insert("severity".to_string(), InputValue::Dropdown("severe".to_string()));
+        inputs.insert(
+            "severity".to_string(),
+            InputValue::Dropdown("severe".to_string()),
+        );
 
         let result = calculate_score(&score_def, &inputs).unwrap();
-        assert_eq!(result.field_points.get("severity"), Some(&3));
+        assert_eq!(result.get_field_points("severity"), Some(3));
     }
 }

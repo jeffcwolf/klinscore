@@ -88,39 +88,51 @@ where
     // Add details if present
     if let Some(details) = details_text {
         content_widgets.push(
-            column![
-                text("Details:").size(14),
-                text(details).size(12),
-            ]
-            .spacing(5)
-            .padding(10)
-            .into(),
+            column![text("Details:").size(14), text(details).size(12),]
+                .spacing(5)
+                .padding(10)
+                .into(),
         );
     }
 
     // Add breakdown of points
-    if !result.field_points.is_empty() {
+    if !result.field_scores.is_empty() {
         let breakdown_label = match language {
             Language::German => "Punkteverteilung:",
             Language::English => "Points Breakdown:",
         };
 
+        let points_label = match language {
+            Language::German => "Pkt.",
+            Language::English => "pts",
+        };
+
         let breakdown_items: Vec<Element<'a, Message>> = result
-            .field_points
+            .field_scores
             .iter()
-            .map(|(field, points)| {
-                text(format!("  • {}: {} points", field, points))
+            .filter(|fs| fs.points != 0)
+            .map(|fs| {
+                let label = match language {
+                    Language::German => &fs.label_de,
+                    Language::English => &fs.label,
+                };
+                text(format!("  {} {} — {}", fs.points, points_label, label))
                     .size(14)
                     .into()
             })
             .collect();
 
-        content_widgets.push(
-            column![text(breakdown_label).size(14), column(breakdown_items).spacing(3)]
+        if !breakdown_items.is_empty() {
+            content_widgets.push(
+                column![
+                    text(breakdown_label).size(16),
+                    column(breakdown_items).spacing(3)
+                ]
                 .spacing(5)
                 .padding(10)
                 .into(),
-        );
+            );
+        }
     }
 
     // Add action buttons
