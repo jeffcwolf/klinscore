@@ -1,6 +1,7 @@
 # KlinScore - Rust + Iced Desktop Application
 # .gitignore
 
+
 # Rust Build Artifacts
 /target/
 **/*.rs.bk
