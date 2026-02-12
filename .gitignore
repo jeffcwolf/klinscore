@@ -170,3 +170,6 @@ screenshots/*.pdf
 # Keep README files in ignored directories
 !**/README.md
 !**/.gitkeep
+
+# Ignore docs in _docs folder
+_docs/
