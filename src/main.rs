@@ -274,7 +274,6 @@ impl KlinScore {
 
         container(content)
             .width(Length::Fill)
-            .height(Length::Fill)
             .center_x(Length::Fill)
             .center_y(Length::Fill)
             .into()
@@ -326,7 +325,6 @@ impl KlinScore {
 
         container(content)
             .width(Length::Fill)
-            .height(Length::Fill)
             .center_x(Length::Fill)
             .center_y(Length::Fill)
             .into()
@@ -422,7 +420,6 @@ impl KlinScore {
 
         container(content)
             .width(Length::Fill)
-            .height(Length::Fill)
             .center_x(Length::Fill)
             .center_y(Length::Fill)
             .into()
@@ -525,7 +522,6 @@ impl KlinScore {
 
         container(content)
             .width(Length::Fill)
-            .height(Length::Fill)
             .center_x(Length::Fill)
             .center_y(Length::Fill)
             .into()
