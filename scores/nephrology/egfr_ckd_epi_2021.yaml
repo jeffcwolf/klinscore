@@ -25,13 +25,22 @@ inputs:
     required: true
 
   - field: "sex"
-    type: "boolean"
-    label: "Female Sex"
-    label_de: "Weibliches Geschlecht"
+    type: "dropdown"
+    label: "Sex"
+    label_de: "Geschlecht"
     points: 0
-    help: "Check if patient is female"
-    help_de: "Ankreuzen, wenn Patient weiblich ist"
+    help: "Patient's biological sex"
+    help_de: "Biologisches Geschlecht des Patienten"
     required: true
+    options:
+      - value: "male"
+        label: "Male"
+        label_de: "Männlich"
+        points: 0
+      - value: "female"
+        label: "Female"
+        label_de: "Weiblich"
+        points: 0
 
   - field: "creatinine"
     type: "number"

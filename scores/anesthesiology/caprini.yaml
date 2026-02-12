@@ -19,7 +19,7 @@ inputs:
     label: "Age 41-60 years"
     label_de: "Alter 41-60 Jahre"
     points: 1
-    required: true
+    required: false
 
   - field: "minor_surgery"
     type: "boolean"
@@ -28,63 +28,63 @@ inputs:
     points: 1
     help: "Surgery <45 minutes"
     help_de: "Operation <45 Minuten"
-    required: true
+    required: false
 
   - field: "bmi_25_30"
     type: "boolean"
     label: "BMI 25-30 kg/m²"
     label_de: "BMI 25-30 kg/m²"
     points: 1
-    required: true
+    required: false
 
   - field: "swollen_legs"
     type: "boolean"
     label: "Swollen legs (current)"
     label_de: "Geschwollene Beine (aktuell)"
     points: 1
-    required: true
+    required: false
 
   - field: "varicose_veins"
     type: "boolean"
     label: "Varicose veins"
     label_de: "Krampfadern"
     points: 1
-    required: true
+    required: false
 
   - field: "pregnancy_postpartum"
     type: "boolean"
     label: "Pregnancy or postpartum (<1 month)"
     label_de: "Schwangerschaft oder Wochenbett (<1 Monat)"
     points: 1
-    required: true
+    required: false
 
   - field: "sepsis"
     type: "boolean"
     label: "Sepsis (<1 month)"
     label_de: "Sepsis (<1 Monat)"
     points: 1
-    required: true
+    required: false
 
   - field: "serious_lung_disease"
     type: "boolean"
     label: "Serious lung disease (incl. pneumonia <1 month)"
     label_de: "Schwere Lungenerkrankung (inkl. Pneumonie <1 Monat)"
     points: 1
-    required: true
+    required: false
 
   - field: "abnormal_pulmonary"
     type: "boolean"
     label: "Abnormal pulmonary function (COPD)"
     label_de: "Abnormale Lungenfunktion (COPD)"
     points: 1
-    required: true
+    required: false
 
   - field: "medical_patient_bed_rest"
     type: "boolean"
     label: "Medical patient on bed rest"
     label_de: "Medizinischer Patient mit Bettruhe"
     points: 1
-    required: true
+    required: false
 
   # 2 Point Risk Factors
   - field: "age_61_74"
@@ -92,56 +92,56 @@ inputs:
     label: "Age 61-74 years"
     label_de: "Alter 61-74 Jahre"
     points: 2
-    required: true
+    required: false
 
   - field: "arthroscopic_surgery"
     type: "boolean"
     label: "Arthroscopic surgery"
     label_de: "Arthroskopische Operation"
     points: 2
-    required: true
+    required: false
 
   - field: "bmi_gt_30"
     type: "boolean"
     label: "BMI >30 kg/m²"
     label_de: "BMI >30 kg/m²"
     points: 2
-    required: true
+    required: false
 
   - field: "major_surgery"
     type: "boolean"
     label: "Major surgery (>45 minutes)"
     label_de: "Große Operation (>45 Minuten)"
     points: 2
-    required: true
+    required: false
 
   - field: "laparoscopic_surgery"
     type: "boolean"
     label: "Laparoscopic surgery (>45 minutes)"
     label_de: "Laparoskopische Operation (>45 Minuten)"
     points: 2
-    required: true
+    required: false
 
   - field: "confined_to_bed"
     type: "boolean"
     label: "Confined to bed (>72 hours)"
     label_de: "Bettlägerig (>72 Stunden)"
     points: 2
-    required: true
+    required: false
 
   - field: "immobilizing_cast"
     type: "boolean"
     label: "Immobilizing plaster cast (<1 month)"
     label_de: "Immobilisierender Gipsverband (<1 Monat)"
     points: 2
-    required: true
+    required: false
 
   - field: "central_venous_access"
     type: "boolean"
     label: "Central venous access"
     label_de: "Zentralvenöser Zugang"
     points: 2
-    required: true
+    required: false
 
   # 3 Point Risk Factors
   - field: "age_gt_75"
@@ -149,7 +149,7 @@ inputs:
     label: "Age >75 years"
     label_de: "Alter >75 Jahre"
     points: 3
-    required: true
+    required: false
 
   - field: "history_vte"
     type: "boolean"
@@ -158,56 +158,56 @@ inputs:
     points: 3
     help: "Previous DVT or PE"
     help_de: "Frühere TVT oder LE"
-    required: true
+    required: false
 
   - field: "family_history_vte"
     type: "boolean"
     label: "Family history of VTE"
     label_de: "Familienanamnese VTE"
     points: 3
-    required: true
+    required: false
 
   - field: "factor_v_leiden"
     type: "boolean"
     label: "Factor V Leiden"
     label_de: "Faktor-V-Leiden"
     points: 3
-    required: true
+    required: false
 
   - field: "prothrombin_mutation"
     type: "boolean"
     label: "Prothrombin 20210A mutation"
     label_de: "Prothrombin-20210A-Mutation"
     points: 3
-    required: true
+    required: false
 
   - field: "elevated_homocysteine"
     type: "boolean"
     label: "Elevated serum homocysteine"
     label_de: "Erhöhtes Serum-Homocystein"
     points: 3
-    required: true
+    required: false
 
   - field: "lupus_anticoagulant"
     type: "boolean"
     label: "Lupus anticoagulant"
     label_de: "Lupus-Antikoagulans"
     points: 3
-    required: true
+    required: false
 
   - field: "anticardiolipin"
     type: "boolean"
     label: "Anticardiolipin antibodies"
     label_de: "Antikardiolipin-Antikörper"
     points: 3
-    required: true
+    required: false
 
   - field: "heparin_induced_thrombocytopenia"
     type: "boolean"
     label: "Heparin-induced thrombocytopenia (HIT)"
     label_de: "Heparin-induzierte Thrombozytopenie (HIT)"
     points: 3
-    required: true
+    required: false
 
   # 5 Point Risk Factors
   - field: "stroke"
@@ -215,7 +215,7 @@ inputs:
     label: "Stroke (<1 month)"
     label_de: "Schlaganfall (<1 Monat)"
     points: 5
-    required: true
+    required: false
 
   - field: "elective_major_lower_extremity_arthroplasty"
     type: "boolean"
@@ -224,21 +224,21 @@ inputs:
     points: 5
     help: "Hip or knee replacement"
     help_de: "Hüft- oder Kniegelenkersatz"
-    required: true
+    required: false
 
   - field: "hip_pelvis_leg_fracture"
     type: "boolean"
     label: "Hip, pelvis, or leg fracture (<1 month)"
     label_de: "Hüft-, Becken- oder Beinfraktur (<1 Monat)"
     points: 5
-    required: true
+    required: false
 
   - field: "acute_spinal_cord_injury"
     type: "boolean"
     label: "Acute spinal cord injury (<1 month)"
     label_de: "Akute Rückenmarksverletzung (<1 Monat)"
     points: 5
-    required: true
+    required: false
 
 interpretation:
   - score: "0-1"

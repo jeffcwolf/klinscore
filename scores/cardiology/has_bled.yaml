@@ -20,7 +20,7 @@ inputs:
     points: 1
     help: "Systolic BP >160 mmHg"
     help_de: "Systolischer RR >160 mmHg"
-    required: true
+    required: false
 
   - field: "abnormal_renal_function"
     type: "boolean"
@@ -29,7 +29,7 @@ inputs:
     points: 1
     help: "Chronic dialysis, transplant, or Cr >200 μmol/L (>2.26 mg/dL)"
     help_de: "Chronische Dialyse, Transplantation oder Kreatinin >200 μmol/L (>2,26 mg/dL)"
-    required: true
+    required: false
 
   - field: "abnormal_liver_function"
     type: "boolean"
@@ -38,7 +38,7 @@ inputs:
     points: 1
     help: "Chronic hepatic disease or bilirubin >2x ULN with AST/ALT/ALP >3x ULN"
     help_de: "Chronische Lebererkrankung oder Bilirubin >2x Obergrenze mit AST/ALT/AP >3x Obergrenze"
-    required: true
+    required: false
 
   - field: "stroke"
     type: "boolean"
@@ -47,7 +47,7 @@ inputs:
     points: 1
     help: "Previous stroke"
     help_de: "Früherer Schlaganfall"
-    required: true
+    required: false
 
   - field: "bleeding"
     type: "boolean"
@@ -56,7 +56,7 @@ inputs:
     points: 1
     help: "Previous major bleeding or predisposition (anemia, etc.)"
     help_de: "Frühere schwere Blutung oder Prädisposition (Anämie, etc.)"
-    required: true
+    required: false
 
   - field: "labile_inr"
     type: "boolean"
@@ -65,7 +65,7 @@ inputs:
     points: 1
     help: "Unstable/high INRs or poor time in therapeutic range (<60%)"
     help_de: "Instabile/hohe INR-Werte oder schlechte Zeit im therapeutischen Bereich (<60%)"
-    required: true
+    required: false
 
   - field: "elderly"
     type: "boolean"
@@ -74,7 +74,7 @@ inputs:
     points: 1
     help: "Age over 65 years"
     help_de: "Alter über 65 Jahre"
-    required: true
+    required: false
 
   - field: "drugs_alcohol"
     type: "boolean"
@@ -83,7 +83,7 @@ inputs:
     points: 1
     help: "Concomitant antiplatelet/NSAID use or alcohol abuse (≥8 drinks/week)"
     help_de: "Begleitende Thrombozytenaggregationshemmer/NSAR oder Alkoholabusus (≥8 Drinks/Woche)"
-    required: true
+    required: false
 
 interpretation:
   - score: "0-2"

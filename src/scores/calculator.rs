@@ -293,11 +293,28 @@ fn evaluate_conditions(
     Ok(0)
 }
 
-/// Evaluate a single condition (e.g., ">= 65", "< 50")
+/// Evaluate a single condition (e.g., ">= 65", "< 50", ">= 30 && < 40")
 fn evaluate_condition(condition: &str, value: f64) -> Result<bool, CalculationError> {
     let condition = condition.trim();
 
-    // Parse the condition
+    // Handle compound conditions with && (AND)
+    if condition.contains("&&") {
+        let parts: Vec<&str> = condition.split("&&").collect();
+        for part in parts {
+            if !evaluate_single_condition(part.trim(), value)? {
+                return Ok(false);
+            }
+        }
+        return Ok(true);
+    }
+
+    evaluate_single_condition(condition, value)
+}
+
+/// Evaluate a single comparison (e.g., ">= 65", "< 50")
+fn evaluate_single_condition(condition: &str, value: f64) -> Result<bool, CalculationError> {
+    let condition = condition.trim();
+
     if let Some(threshold_str) = condition.strip_prefix(">=") {
         let threshold: f64 = threshold_str.trim().parse().map_err(|_| {
             CalculationError::ConditionParseError {
@@ -444,6 +461,11 @@ fn matches_score_range(range: &ScoreRange, score: i32) -> Result<bool, Calculati
                     }
                 })?;
                 return Ok(score < threshold);
+            }
+
+            // Handle plain number as exact match (e.g., "2" in YAML becomes Range("2"))
+            if let Ok(exact_value) = range_str.parse::<i32>() {
+                return Ok(score == exact_value);
             }
 
             Err(CalculationError::ConditionParseError {
@@ -625,6 +647,24 @@ mod tests {
 
         assert!(evaluate_condition("<= 100", 100.0).unwrap());
         assert!(!evaluate_condition("<= 100", 101.0).unwrap());
+    }
+
+    #[test]
+    fn test_evaluate_compound_condition() {
+        // Test && (AND) conditions used in GRACE score
+        assert!(evaluate_condition(">= 30 && < 40", 35.0).unwrap());
+        assert!(evaluate_condition(">= 30 && < 40", 30.0).unwrap());
+        assert!(!evaluate_condition(">= 30 && < 40", 40.0).unwrap());
+        assert!(!evaluate_condition(">= 30 && < 40", 29.0).unwrap());
+
+        // Boundary test
+        assert!(evaluate_condition(">= 50 && < 60", 50.0).unwrap());
+        assert!(evaluate_condition(">= 50 && < 60", 59.9).unwrap());
+        assert!(!evaluate_condition(">= 50 && < 60", 60.0).unwrap());
+
+        // Three conditions
+        assert!(evaluate_condition(">= 10 && < 20 && != 15", 12.0).unwrap());
+        assert!(!evaluate_condition(">= 10 && < 20 && != 15", 15.0).unwrap());
     }
 
     #[test]

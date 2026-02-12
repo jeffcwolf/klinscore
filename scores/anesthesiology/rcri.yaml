@@ -20,7 +20,7 @@ inputs:
     points: 1
     help: "Intraperitoneal, intrathoracic, or suprainguinal vascular surgery"
     help_de: "Intraperitoneale, intrathorakale oder suprainguinale Gefäßchirurgie"
-    required: true
+    required: false
 
   - field: "ischemic_heart_disease"
     type: "boolean"
@@ -29,7 +29,7 @@ inputs:
     points: 1
     help: "History of MI, positive stress test, chest pain due to ischemia, nitrate use, ECG with Q waves"
     help_de: "Anamnese eines MI, positiver Belastungstest, Thoraxschmerz durch Ischämie, Nitrat-Verwendung, EKG mit Q-Zacken"
-    required: true
+    required: false
 
   - field: "heart_failure"
     type: "boolean"
@@ -38,7 +38,7 @@ inputs:
     points: 1
     help: "History of CHF, pulmonary edema, PND, bilateral rales, S3 gallop, or CXR with pulmonary edema"
     help_de: "Anamnese einer Herzinsuffizienz, Lungenödem, PND, beidseitige Rasselgeräusche, S3-Galopp oder Thorax-Röntgen mit Lungenödem"
-    required: true
+    required: false
 
   - field: "cerebrovascular_disease"
     type: "boolean"
@@ -47,7 +47,7 @@ inputs:
     points: 1
     help: "History of TIA or stroke"
     help_de: "Anamnese einer TIA oder eines Schlaganfalls"
-    required: true
+    required: false
 
   - field: "diabetes_insulin"
     type: "boolean"
@@ -56,7 +56,7 @@ inputs:
     points: 1
     help: "Preoperative treatment with insulin (not oral hypoglycemics alone)"
     help_de: "Präoperative Behandlung mit Insulin (nicht orale Antidiabetika allein)"
-    required: true
+    required: false
 
   - field: "renal_insufficiency"
     type: "boolean"
@@ -65,7 +65,7 @@ inputs:
     points: 1
     help: "Preoperative creatinine >177 μmol/L (>2.0 mg/dL)"
     help_de: "Präoperatives Kreatinin >177 μmol/L (>2,0 mg/dL)"
-    required: true
+    required: false
 
 interpretation:
   - score: 0

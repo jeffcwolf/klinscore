@@ -41,7 +41,7 @@ inputs:
     points: 1
     help: "History of CHF or objective evidence of moderate to severe LV systolic dysfunction (e.g., LVEF ≤40%)"
     help_de: "Anamnese einer Herzinsuffizienz oder objektiver Nachweis einer mittel- bis schwergradigen LV-Dysfunktion (z.B. LVEF ≤40%)"
-    required: true
+    required: false
 
   - field: "hypertension"
     type: "boolean"
@@ -50,7 +50,7 @@ inputs:
     points: 1
     help: "Blood pressure consistently >140/90 mmHg or on antihypertensive treatment"
     help_de: "Blutdruck durchgehend >140/90 mmHg oder antihypertensive Behandlung"
-    required: true
+    required: false
 
   - field: "diabetes"
     type: "boolean"
@@ -59,7 +59,7 @@ inputs:
     points: 1
     help: "Fasting glucose >125 mg/dL (7.0 mmol/L) or on hypoglycemic treatment"
     help_de: "Nüchternglukose >125 mg/dL (7,0 mmol/L) oder unter blutzuckersenkender Behandlung"
-    required: true
+    required: false
 
   - field: "stroke_tia"
     type: "boolean"
@@ -68,7 +68,7 @@ inputs:
     points: 2
     help: "Previous stroke, transient ischemic attack, or systemic thromboembolism"
     help_de: "Früherer Schlaganfall, transitorische ischämische Attacke oder systemische Thromboembolie"
-    required: true
+    required: false
 
   - field: "vascular_disease"
     type: "boolean"
@@ -77,7 +77,7 @@ inputs:
     points: 1
     help: "Prior myocardial infarction, peripheral artery disease, or aortic plaque"
     help_de: "Früherer Myokardinfarkt, periphere arterielle Verschlusskrankheit oder Aortenplaque"
-    required: true
+    required: false
 
 interpretation:
   - score: 0

@@ -124,7 +124,7 @@ inputs:
     points: 39
     help: "Resuscitated cardiac arrest on presentation"
     help_de: "Reanimierter Herzstillstand bei Vorstellung"
-    required: true
+    required: false
 
   - field: "st_deviation"
     type: "boolean"
@@ -133,7 +133,7 @@ inputs:
     points: 28
     help: "ST-segment elevation or depression on ECG"
     help_de: "ST-Strecken-Hebung oder -Senkung im EKG"
-    required: true
+    required: false
 
   - field: "elevated_enzymes"
     type: "boolean"
@@ -142,7 +142,7 @@ inputs:
     points: 14
     help: "Elevated troponin or CK-MB"
     help_de: "Erhöhtes Troponin oder CK-MB"
-    required: true
+    required: false
 
   - field: "killip_class"
     type: "dropdown"

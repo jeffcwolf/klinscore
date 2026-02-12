@@ -5,10 +5,24 @@ use crate::config::{InputField, InputType, ScoreDefinition};
 use crate::scores::InputValue;
 use crate::ui::Language;
 use iced::{
-    widget::{button, checkbox, column, container, row, text, text_input},
+    widget::{button, checkbox, column, container, pick_list, row, text, text_input},
     Element, Length,
 };
 use std::collections::HashMap;
+use std::fmt;
+
+/// A displayable dropdown option for pick_list
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DropdownItem {
+    pub value: String,
+    pub display: String,
+}
+
+impl fmt::Display for DropdownItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.display)
+    }
+}
 
 /// State for score input form
 #[derive(Debug, Clone)]
@@ -194,21 +208,48 @@ where
         }
 
         InputType::Dropdown => {
-            // For now, show placeholder - full dropdown implementation would use iced::pick_list
-            let current = state
+            let options: Vec<DropdownItem> = field
+                .options
+                .iter()
+                .map(|opt| {
+                    let display = match language {
+                        Language::German => &opt.label_de,
+                        Language::English => &opt.label,
+                    };
+                    DropdownItem {
+                        value: opt.value.clone(),
+                        display: display.clone(),
+                    }
+                })
+                .collect();
+
+            let selected = state
                 .inputs
                 .get(&field.field)
                 .and_then(|v| v.as_string())
-                .unwrap_or("(select)");
+                .and_then(|selected_value| {
+                    options.iter().find(|o| o.value == selected_value).cloned()
+                });
 
-            column![
-                text(label_with_unit).size(16),
-                text(format!("Selected: {}", current)).size(14),
-                text("Dropdown options coming soon...").size(12),
-            ]
-            .spacing(5)
-            .padding(10)
-            .into()
+            let field_name = field.field.clone();
+            let placeholder = match language {
+                Language::German => "Bitte auswählen...",
+                Language::English => "Please select...",
+            };
+
+            let picker = pick_list(options, selected, move |item: DropdownItem| {
+                on_message(InputMessage::DropdownSelected(
+                    field_name.clone(),
+                    item.value,
+                ))
+            })
+            .placeholder(placeholder)
+            .width(Length::Fixed(400.0));
+
+            column![text(label_with_unit).size(16), picker,]
+                .spacing(5)
+                .padding(10)
+                .into()
         }
     }
 }

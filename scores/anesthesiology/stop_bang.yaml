@@ -20,7 +20,7 @@ inputs:
     points: 1
     help: "Loud enough to be heard through closed door"
     help_de: "Laut genug, um durch geschlossene Tür gehört zu werden"
-    required: true
+    required: false
 
   - field: "tired"
     type: "boolean"
@@ -29,7 +29,7 @@ inputs:
     points: 1
     help: "Often feel tired, fatigued, or sleepy during daytime"
     help_de: "Fühlt sich tagsüber oft müde, erschöpft oder schläfrig"
-    required: true
+    required: false
 
   - field: "observed"
     type: "boolean"
@@ -38,7 +38,7 @@ inputs:
     points: 1
     help: "Has anyone observed you stop breathing during sleep"
     help_de: "Hat jemand beobachtet, dass Sie im Schlaf aufhören zu atmen"
-    required: true
+    required: false
 
   - field: "pressure"
     type: "boolean"
@@ -47,7 +47,7 @@ inputs:
     points: 1
     help: "Treated or untreated hypertension"
     help_de: "Behandelte oder unbehandelte Hypertonie"
-    required: true
+    required: false
 
   - field: "bmi"
     type: "boolean"
@@ -56,7 +56,7 @@ inputs:
     points: 1
     help: "Body Mass Index greater than 35"
     help_de: "Body-Mass-Index größer als 35"
-    required: true
+    required: false
 
   - field: "age"
     type: "boolean"
@@ -65,7 +65,7 @@ inputs:
     points: 1
     help: "Older than 50 years"
     help_de: "Älter als 50 Jahre"
-    required: true
+    required: false
 
   - field: "neck"
     type: "boolean"
@@ -74,7 +74,7 @@ inputs:
     points: 1
     help: "Neck circumference >40 cm (measured around Adam's apple)"
     help_de: "Halsumfang >40 cm (gemessen um den Adamsapfel)"
-    required: true
+    required: false
 
   - field: "gender"
     type: "boolean"
@@ -83,7 +83,7 @@ inputs:
     points: 1
     help: "Patient is male"
     help_de: "Patient ist männlich"
-    required: true
+    required: false
 
 interpretation:
   - score: "0-2"
