@@ -27,6 +27,9 @@ guideline_source: "ESC 2024"
 # Full reference citation with page numbers if applicable
 reference: "Author et al. Journal Name. 2024;123(4):567-890. doi:10.1234/example"
 
+# URL to the primary reference (DOI link, PubMed, or guideline page)
+reference_url: "https://doi.org/10.1234/example"
+
 # Validation status: "peer_reviewed", "draft", "community", "experimental"
 validation_status: "peer_reviewed"
 

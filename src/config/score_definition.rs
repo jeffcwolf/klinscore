@@ -28,6 +28,10 @@ pub struct ScoreDefinition {
     /// Full reference citation
     pub reference: String,
 
+    /// URL to the primary reference (DOI link, PubMed, or guideline page)
+    #[serde(default)]
+    pub reference_url: String,
+
     /// Validation status (e.g., "peer_reviewed", "draft")
     pub validation_status: String,
 

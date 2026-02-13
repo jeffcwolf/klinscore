@@ -565,6 +565,7 @@ mod tests {
             version: "1.0".to_string(),
             guideline_source: "Test".to_string(),
             reference: "Test".to_string(),
+            reference_url: String::new(),
             validation_status: "draft".to_string(),
             description: String::new(),
             description_de: String::new(),

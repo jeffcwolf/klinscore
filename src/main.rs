@@ -92,6 +92,7 @@ enum Message {
     ClearHistory,
     OpenAbout,
     CloseAbout,
+    OpenUrl(String),
     ExportCsv,
     ExportJson,
     ExportPdf,
@@ -281,6 +282,9 @@ impl KlinScore {
                     .map(|s| *s)
                     .unwrap_or(AppState::Welcome);
             }
+            Message::OpenUrl(url) => {
+                let _ = opener::open(&url);
+            }
             Message::ExportCsv => {
                 if let Some(record) = self.current_export_record() {
                     let filename = export::default_filename(&record.score_name, "csv");
@@ -398,7 +402,14 @@ impl KlinScore {
             .on_press(Message::OpenHistory)
             .padding(10);
 
-        let about_button = button(text("?")).on_press(Message::OpenAbout).padding(10);
+        let about_label = match self.language {
+            Language::German => "Über",
+            Language::English => "About",
+        };
+
+        let about_button = button(text(about_label))
+            .on_press(Message::OpenAbout)
+            .padding(10);
 
         let settings_label = match self.language {
             Language::German => "Einstellungen",
@@ -412,8 +423,8 @@ impl KlinScore {
         let header = row![
             text("KlinScore").size(32).width(Length::Fill),
             history_button,
-            about_button,
             settings_button,
+            about_button,
             language_button
         ]
         .spacing(10)
@@ -830,10 +841,9 @@ impl KlinScore {
     }
 
     fn about_view(&self) -> Element<'_, Message> {
-        let back_label = match self.language {
-            Language::German => "← Zurück",
-            Language::English => "← Back",
-        };
+        let is_de = self.language == Language::German;
+
+        let back_label = if is_de { "← Zurück" } else { "← Back" };
 
         let scores_count = self
             .score_library
@@ -841,134 +851,102 @@ impl KlinScore {
             .map(|lib| lib.count())
             .unwrap_or(0);
 
-        let (
-            title,
-            subtitle,
-            version_label,
-            scores_label,
-            specialties_label,
-            guidelines_label,
-            features_title,
-            features,
-            license_label,
-            source_label,
-            disclaimer_title,
-            disclaimer_text,
-        ) = match self.language {
-            Language::German => (
-                "Über KlinScore",
-                "Quelloffener klinischer Score-Rechner für evidenzbasierte Medizin",
-                "Version",
-                "Scores geladen",
-                "Fachgebiete: Kardiologie, Nephrologie, Anästhesiologie",
-                "Leitlinien: ESC 2024, KDIGO, ACCP, ASA",
-                "Funktionen",
-                vec![
-                    "Mehrere Fachgebiete mit validierten klinischen Scores",
-                    "Deutsch/Englisch-Sprachunterstützung",
-                    "Offline-fähig — keine Internetverbindung erforderlich",
-                    "YAML-basierte Score-Definitionen — von Ärzten erweiterbar",
-                    "Farbcodierte Risikovisualisierung",
-                    "Detaillierte Punkteaufschlüsselung pro Berechnung",
-                    "Berechnungsverlauf innerhalb der Sitzung",
-                ],
-                "Lizenz: MIT / Apache 2.0",
-                "Quellcode",
-                "Haftungsausschluss",
-                "KlinScore ist ein Hilfsmittel zur klinischen Entscheidungsunterstützung. \
-                 Es ersetzt nicht die klinische Beurteilung durch einen Arzt. \
-                 Alle Scores sollten im klinischen Kontext des Patienten interpretiert werden. \
-                 Keine Garantie für Richtigkeit oder Vollständigkeit.",
-            ),
-            Language::English => (
-                "About KlinScore",
-                "Open-source clinical score calculator for evidence-based medicine",
-                "Version",
-                "Scores loaded",
-                "Specialties: Cardiology, Nephrology, Anesthesiology",
-                "Guidelines: ESC 2024, KDIGO, ACCP, ASA",
-                "Features",
-                vec![
-                    "Multiple specialties with validated clinical scores",
-                    "German/English language support",
-                    "Offline-capable — no internet connection required",
-                    "YAML-based score definitions — extensible by physicians",
-                    "Color-coded risk visualization",
-                    "Detailed points breakdown per calculation",
-                    "In-session calculation history",
-                ],
-                "License: MIT / Apache 2.0",
-                "Source code",
-                "Disclaimer",
-                "KlinScore is a clinical decision support tool. \
-                 It does not replace clinical judgment by a physician. \
-                 All scores should be interpreted in the patient's clinical context. \
-                 No guarantee of accuracy or completeness.",
-            ),
+        let title = if is_de {
+            "Über KlinScore"
+        } else {
+            "About KlinScore"
+        };
+        let subtitle = if is_de {
+            "Quelloffener klinischer Score-Rechner für evidenzbasierte Medizin"
+        } else {
+            "Open-source clinical score calculator for evidence-based medicine"
         };
 
-        let feature_items: Vec<Element<'_, Message>> = features
-            .into_iter()
-            .map(|f| text(format!("  • {}", f)).size(14).into())
-            .collect();
+        // -- Version / stats --
+        let version_label = "Version";
+        let scores_label = if is_de {
+            "Scores geladen"
+        } else {
+            "Scores loaded"
+        };
+        let stats_section = column![
+            text(format!("{}: 0.1.0", version_label)).size(14),
+            text(format!("{}: {}", scores_label, scores_count)).size(14),
+            text(if is_de {
+                "Fachgebiete: Kardiologie, Nephrologie, Anästhesiologie"
+            } else {
+                "Specialties: Cardiology, Nephrology, Anesthesiology"
+            })
+            .size(14),
+            text(if is_de {
+                "Leitlinien: ESC 2024, KDIGO, ACCP, ASA"
+            } else {
+                "Guidelines: ESC 2024, KDIGO, ACCP, ASA"
+            })
+            .size(14),
+            text("Lizenz / License: MIT / Apache 2.0").size(14),
+        ]
+        .spacing(5)
+        .padding(10);
+
+        // -- Disclaimer --
+        let disclaimer_title = if is_de {
+            "Haftungsausschluss"
+        } else {
+            "Disclaimer"
+        };
+        let disclaimer_text = if is_de {
+            "KlinScore ist ein Hilfsmittel zur klinischen Entscheidungsunterstützung. \
+             Es ersetzt nicht die klinische Beurteilung durch einen Arzt. \
+             Alle Scores sollten im klinischen Kontext des Patienten interpretiert werden. \
+             Keine Garantie für Richtigkeit oder Vollständigkeit."
+        } else {
+            "KlinScore is a clinical decision support tool. \
+             It does not replace clinical judgment by a physician. \
+             All scores should be interpreted in the patient's clinical context. \
+             No guarantee of accuracy or completeness."
+        };
+
+        let disclaimer_box = container(
+            column![
+                text(disclaimer_title).size(16),
+                text(disclaimer_text).size(13),
+            ]
+            .spacing(5),
+        )
+        .padding(15)
+        .style(|theme: &iced::Theme| {
+            let palette = theme.palette();
+            container::Style {
+                background: Some(iced::Background::Color(iced::Color {
+                    a: 0.08,
+                    ..palette.danger
+                })),
+                border: iced::Border {
+                    color: iced::Color {
+                        a: 0.3,
+                        ..palette.danger
+                    },
+                    width: 1.0,
+                    radius: 6.0.into(),
+                },
+                ..Default::default()
+            }
+        });
+
+        // -- Score Methodology & Sources (main transparency section) --
+        let methodology_section = self.about_methodology_section();
 
         let content = column![
             text(title).size(32),
             text(subtitle).size(16),
             horizontal_rule(1),
-            // Version and stats
-            column![
-                text(format!("{}: 0.1.0", version_label)).size(14),
-                text(format!("{}: {}", scores_label, scores_count)).size(14),
-                text(specialties_label).size(14),
-                text(guidelines_label).size(14),
-                text(license_label).size(14),
-                text(format!(
-                    "{}: github.com/yourusername/klinscore",
-                    source_label
-                ))
-                .size(14),
-            ]
-            .spacing(5)
-            .padding(10),
+            stats_section,
             horizontal_rule(1),
-            // Features
-            column![
-                text(features_title).size(20),
-                column(feature_items).spacing(4),
-            ]
-            .spacing(8)
-            .padding(10),
+            disclaimer_box,
             horizontal_rule(1),
-            // Disclaimer
-            container(
-                column![
-                    text(disclaimer_title).size(16),
-                    text(disclaimer_text).size(13),
-                ]
-                .spacing(5),
-            )
-            .padding(15)
-            .style(|theme: &iced::Theme| {
-                let palette = theme.palette();
-                container::Style {
-                    background: Some(iced::Background::Color(iced::Color {
-                        a: 0.08,
-                        ..palette.danger
-                    })),
-                    border: iced::Border {
-                        color: iced::Color {
-                            a: 0.3,
-                            ..palette.danger
-                        },
-                        width: 1.0,
-                        radius: 6.0.into(),
-                    },
-                    ..Default::default()
-                }
-            }),
-            // Available scores section
-            self.about_scores_section(),
+            methodology_section,
+            horizontal_rule(1),
             // Back button
             button(text(back_label).size(18))
                 .on_press(Message::CloseAbout)
@@ -977,7 +955,7 @@ impl KlinScore {
         .spacing(15)
         .align_x(Alignment::Center)
         .padding(40)
-        .max_width(700);
+        .max_width(900);
 
         container(content)
             .width(Length::Fill)
@@ -985,52 +963,259 @@ impl KlinScore {
             .into()
     }
 
-    fn about_scores_section(&self) -> Element<'_, Message> {
-        let title = match self.language {
-            Language::German => "Verfügbare Scores",
-            Language::English => "Available Scores",
+    /// Build the methodology & sources section for the About page.
+    /// Shows each score with: calculation method, inputs, formula/logic, and clickable reference.
+    fn about_methodology_section(&self) -> Element<'_, Message> {
+        let is_de = self.language == Language::German;
+
+        let section_title = if is_de {
+            "Score-Methodik & Quellenangaben"
+        } else {
+            "Score Methodology & Sources"
         };
 
-        if let Some(library) = &self.score_library {
-            let mut score_items: Vec<Element<'_, Message>> = Vec::new();
+        let section_subtitle = if is_de {
+            "Vollständige Transparenz über die verwendeten Berechnungsverfahren und deren wissenschaftliche Grundlage."
+        } else {
+            "Full transparency on calculation methods and their scientific basis."
+        };
 
-            for specialty in &[
-                Specialty::Cardiology,
-                Specialty::Nephrology,
-                Specialty::Anesthesiology,
-            ] {
-                let scores = library.get_scores_for_specialty(*specialty);
-                if scores.is_empty() {
-                    continue;
-                }
+        let library = match &self.score_library {
+            Some(lib) => lib,
+            None => return text("").into(),
+        };
 
-                let specialty_name = match self.language {
-                    Language::German => specialty.german(),
-                    Language::English => specialty.english(),
-                };
+        let mut all_cards: Vec<Element<'_, Message>> = Vec::new();
 
-                score_items.push(text(specialty_name).size(16).into());
-
-                for score in &scores {
-                    let name = match self.language {
-                        Language::German => &score.name_de,
-                        Language::English => &score.name,
-                    };
-                    score_items.push(
-                        text(format!("    • {} ({})", name, score.guideline_source))
-                            .size(13)
-                            .into(),
-                    );
-                }
+        for specialty in &[
+            Specialty::Cardiology,
+            Specialty::Nephrology,
+            Specialty::Anesthesiology,
+        ] {
+            let scores = library.get_scores_for_specialty(*specialty);
+            if scores.is_empty() {
+                continue;
             }
 
-            column![text(title).size(20), column(score_items).spacing(4),]
-                .spacing(8)
-                .padding(10)
-                .into()
-        } else {
-            text("").into()
+            let specialty_name = if is_de {
+                specialty.german()
+            } else {
+                specialty.english()
+            };
+
+            // Specialty header
+            all_cards.push(text(format!("--- {} ---", specialty_name)).size(18).into());
+
+            for score in &scores {
+                all_cards.push(self.score_methodology_card(score));
+            }
         }
+
+        column![
+            text(section_title).size(24),
+            text(section_subtitle).size(14),
+            column(all_cards).spacing(12),
+        ]
+        .spacing(12)
+        .padding(10)
+        .into()
+    }
+
+    /// Build a single score methodology card with: name, method, inputs, calculation, reference link.
+    fn score_methodology_card<'a>(
+        &self,
+        score: &'a config::ScoreDefinition,
+    ) -> Element<'a, Message> {
+        let is_de = self.language == Language::German;
+
+        let name = if is_de { &score.name_de } else { &score.name };
+        let description = if is_de {
+            &score.description_de
+        } else {
+            &score.description
+        };
+
+        // Determine calculation method
+        let (method_label, method_detail) = if let Some(ref formula) = score.formula {
+            let label = if is_de {
+                "Formelbasiert"
+            } else {
+                "Formula-based"
+            };
+            let detail = match formula.as_str() {
+                "ckd_epi_2021" => {
+                    if is_de {
+                        "eGFR = 142 \u{00d7} min(Scr/\u{03ba}, 1)^\u{03b1} \u{00d7} max(Scr/\u{03ba}, 1)^(\u{2212}1.200) \u{00d7} 0.9938^Alter \u{00d7} (1.012 bei Frauen)\n\
+                         Wobei: Weiblich \u{03ba}=0.7, \u{03b1}=\u{2212}0.241 | Männlich \u{03ba}=0.9, \u{03b1}=\u{2212}0.302\n\
+                         Scr in mg/dL (Eingabe \u{03bc}mol/L \u{00f7} 88.4)"
+                            .to_string()
+                    } else {
+                        "eGFR = 142 \u{00d7} min(Scr/\u{03ba}, 1)^\u{03b1} \u{00d7} max(Scr/\u{03ba}, 1)^(\u{2212}1.200) \u{00d7} 0.9938^age \u{00d7} (1.012 if female)\n\
+                         Where: Female \u{03ba}=0.7, \u{03b1}=\u{2212}0.241 | Male \u{03ba}=0.9, \u{03b1}=\u{2212}0.302\n\
+                         Scr in mg/dL (input \u{03bc}mol/L \u{00f7} 88.4)"
+                            .to_string()
+                    }
+                }
+                "kfre_4var" => {
+                    if is_de {
+                        "Risiko = 1 \u{2212} 0.9832^exp(Summe)\n\
+                         Summe = \u{2212}0.2201\u{00d7}(Alter/10 \u{2212} 7.036) + 0.2467\u{00d7}(männl. \u{2212} 0.5642) \u{2212} 0.5567\u{00d7}(eGFR/5 \u{2212} 7.222) + 0.4510\u{00d7}(ln(ACR) \u{2212} 5.137)\n\
+                         ACR-Eingabe: mg/mmol, intern umgerechnet in mg/g (\u{00d7} 8.84)"
+                            .to_string()
+                    } else {
+                        "Risk = 1 \u{2212} 0.9832^exp(sum)\n\
+                         sum = \u{2212}0.2201\u{00d7}(age/10 \u{2212} 7.036) + 0.2467\u{00d7}(male \u{2212} 0.5642) \u{2212} 0.5567\u{00d7}(eGFR/5 \u{2212} 7.222) + 0.4510\u{00d7}(ln(ACR) \u{2212} 5.137)\n\
+                         ACR input: mg/mmol, converted to mg/g internally (\u{00d7} 8.84)"
+                            .to_string()
+                    }
+                }
+                _ => formula.clone(),
+            };
+            (label, detail)
+        } else {
+            let label = if is_de {
+                "Punktebasiert"
+            } else {
+                "Point-based"
+            };
+            let detail = if is_de {
+                "Summe der Punkte aller zutreffenden Kriterien".to_string()
+            } else {
+                "Sum of points for all applicable criteria".to_string()
+            };
+            (label, detail)
+        };
+
+        // Build inputs summary
+        let inputs_label = if is_de { "Eingaben" } else { "Inputs" };
+        let inputs_summary: String = score
+            .inputs
+            .iter()
+            .map(|input| {
+                let label = if is_de { &input.label_de } else { &input.label };
+                let type_str = match input.input_type {
+                    config::InputType::Boolean => {
+                        if is_de {
+                            "Ja/Nein"
+                        } else {
+                            "Yes/No"
+                        }
+                    }
+                    config::InputType::Number => {
+                        if let Some(ref unit) = input.unit {
+                            return format!("{} ({})", label, unit);
+                        }
+                        if is_de {
+                            "Zahl"
+                        } else {
+                            "Number"
+                        }
+                    }
+                    config::InputType::Dropdown => {
+                        if is_de {
+                            "Auswahl"
+                        } else {
+                            "Selection"
+                        }
+                    }
+                };
+                format!("{} ({})", label, type_str)
+            })
+            .collect::<Vec<_>>()
+            .join(", ");
+
+        // Build the reference row with a clickable link button
+        let reference_elements: Element<'_, Message> = if score.reference_url.is_empty() {
+            text(&score.reference).size(12).into()
+        } else {
+            let url = score.reference_url.clone();
+            let link_label = if is_de {
+                "Quelle öffnen"
+            } else {
+                "Open source"
+            };
+            column![
+                text(&score.reference).size(12),
+                button(text(format!("\u{1f517} {}", link_label)).size(12))
+                    .on_press(Message::OpenUrl(url))
+                    .padding(4),
+            ]
+            .spacing(4)
+            .into()
+        };
+
+        let method_heading = if is_de { "Methode" } else { "Method" };
+        let calc_heading = if is_de { "Berechnung" } else { "Calculation" };
+        let ref_heading = if is_de { "Referenz" } else { "Reference" };
+
+        // Build the card
+        let card = container(
+            column![
+                // Score name and description
+                text(name).size(16),
+                text(description).size(13),
+                // Method
+                row![
+                    text(format!("{}: ", method_heading)).size(13),
+                    text(method_label).size(13),
+                ]
+                .spacing(4),
+                // Inputs
+                text(format!("{}: {}", inputs_label, inputs_summary)).size(12),
+                // Calculation detail
+                container(
+                    column![
+                        text(format!("{}:", calc_heading)).size(13),
+                        text(method_detail).size(12),
+                    ]
+                    .spacing(2),
+                )
+                .padding(8)
+                .style(|theme: &iced::Theme| {
+                    let palette = theme.palette();
+                    container::Style {
+                        background: Some(iced::Background::Color(iced::Color {
+                            a: 0.05,
+                            ..palette.text
+                        })),
+                        border: iced::Border {
+                            color: iced::Color::TRANSPARENT,
+                            width: 0.0,
+                            radius: 4.0.into(),
+                        },
+                        ..Default::default()
+                    }
+                }),
+                // Reference
+                column![
+                    text(format!("{} ({})", ref_heading, score.guideline_source)).size(13),
+                    reference_elements,
+                ]
+                .spacing(2),
+            ]
+            .spacing(6),
+        )
+        .padding(12)
+        .style(|theme: &iced::Theme| {
+            let palette = theme.palette();
+            container::Style {
+                background: Some(iced::Background::Color(iced::Color {
+                    a: 0.04,
+                    ..palette.text
+                })),
+                border: iced::Border {
+                    color: iced::Color {
+                        a: 0.15,
+                        ..palette.text
+                    },
+                    width: 1.0,
+                    radius: 8.0.into(),
+                },
+                ..Default::default()
+            }
+        });
+
+        card.into()
     }
 
     fn error_view<'a>(&self, error: &'a str) -> Element<'a, Message> {
