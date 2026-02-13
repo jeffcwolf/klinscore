@@ -412,7 +412,6 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - **Physicians** who validated scores and provided feedback
-- **Charité University Hospital** for clinical score requirements research
 - **Rust Community** for excellent tooling and libraries
 - **Iced Framework** for making native GUI development enjoyable
 
@@ -443,7 +442,7 @@ If you find KlinScore useful, please consider starring the repository! It helps 
 
 <div align="center">
 
-**Built with ❤️ for physicians by physicians (and engineers)**
+**Built for physicians by physicians (and engineers)**
 
 *Making evidence-based medicine faster, one calculation at a time.*
 
