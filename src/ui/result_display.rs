@@ -15,6 +15,9 @@ pub fn result_display_view<'a, Message>(
     language: Language,
     on_recalculate: Message,
     on_back: Message,
+    on_export_csv: Message,
+    on_export_json: Message,
+    on_export_pdf: Message,
 ) -> Element<'a, Message>
 where
     Message: Clone + 'a,
@@ -60,6 +63,11 @@ where
     let back_label = match language {
         Language::German => "← Zurück",
         Language::English => "← Back",
+    };
+
+    let export_label = match language {
+        Language::German => "Exportieren:",
+        Language::English => "Export:",
     };
 
     let mut content_widgets = vec![
@@ -134,6 +142,26 @@ where
             );
         }
     }
+
+    // Export buttons row
+    content_widgets.push(
+        row![
+            text(export_label).size(14),
+            button(text("CSV").size(14))
+                .on_press(on_export_csv)
+                .padding(8),
+            button(text("JSON").size(14))
+                .on_press(on_export_json)
+                .padding(8),
+            button(text("PDF").size(14))
+                .on_press(on_export_pdf)
+                .padding(8),
+        ]
+        .spacing(10)
+        .align_y(Alignment::Center)
+        .padding(10)
+        .into(),
+    );
 
     // Add action buttons
     content_widgets.push(

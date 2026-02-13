@@ -2,11 +2,14 @@
 // main.rs
 
 mod config;
+mod export;
+mod persistence;
 mod scores;
 mod settings;
 mod ui;
 
 use config::Specialty;
+use export::ExportRecord;
 use scores::{calculate_score, load_all_scores, CalculationResult, ScoreLibrary};
 use settings::{AppTheme, Settings};
 use ui::{InputMessage, Language, ScoreInputState};
@@ -18,11 +21,10 @@ use iced::{
 };
 
 /// A single calculation history entry
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 struct HistoryEntry {
     score_name: String,
     score_name_de: String,
-    #[allow(dead_code)]
     score_id: String,
     specialty: Specialty,
     total_score: i32,
@@ -90,16 +92,33 @@ enum Message {
     ClearHistory,
     OpenAbout,
     CloseAbout,
+    ExportCsv,
+    ExportJson,
+    ExportPdf,
+    ExportComplete(Result<String, String>),
 }
 
 impl KlinScore {
     fn new() -> (Self, Task<Message>) {
+        // Load persisted settings and history
+        let (settings, language) = match persistence::load_settings() {
+            Some(persisted) => {
+                let mut settings = Settings::new();
+                settings.theme = persisted.theme;
+                settings.show_help_hints = persisted.show_help_hints;
+                settings.auto_calculate = persisted.auto_calculate;
+                (settings, persisted.language)
+            }
+            None => (Settings::new(), Language::German),
+        };
+        let history: Vec<HistoryEntry> = persistence::load_history();
+
         let app = Self {
             state: AppState::Loading,
-            language: Language::German,
+            language,
             score_library: None,
-            settings: Settings::new(),
-            history: Vec::new(),
+            settings,
+            history,
             previous_state: None,
         };
 
@@ -124,6 +143,7 @@ impl KlinScore {
                     Language::German => Language::English,
                     Language::English => Language::German,
                 };
+                persistence::save_settings(&self.settings, self.language);
             }
             Message::ScoresLoaded(result) => match result {
                 Ok(library) => {
@@ -193,6 +213,7 @@ impl KlinScore {
                                                     .to_string(),
                                             };
                                             self.history.push(entry);
+                                            persistence::save_history(&self.history);
 
                                             *result = Some(calc_result);
                                             *error = None;
@@ -232,6 +253,7 @@ impl KlinScore {
             }
             Message::ThemeChanged(theme) => {
                 self.settings.theme = theme;
+                persistence::save_settings(&self.settings, self.language);
             }
             Message::OpenHistory => {
                 self.previous_state = Some(Box::new(self.state.clone()));
@@ -246,6 +268,7 @@ impl KlinScore {
             }
             Message::ClearHistory => {
                 self.history.clear();
+                persistence::save_history(&self.history);
             }
             Message::OpenAbout => {
                 self.previous_state = Some(Box::new(self.state.clone()));
@@ -258,8 +281,92 @@ impl KlinScore {
                     .map(|s| *s)
                     .unwrap_or(AppState::Welcome);
             }
+            Message::ExportCsv => {
+                if let Some(record) = self.current_export_record() {
+                    let filename = export::default_filename(&record.score_name, "csv");
+                    return Task::perform(
+                        async move {
+                            export::csv_export::export_to_csv_file(&record, &filename)
+                                .map(|()| filename)
+                        },
+                        Message::ExportComplete,
+                    );
+                }
+            }
+            Message::ExportJson => {
+                if let Some(record) = self.current_export_record() {
+                    let filename = export::default_filename(&record.score_name, "json");
+                    return Task::perform(
+                        async move {
+                            export::json_export::export_to_json_file(&record, &filename)
+                                .map(|()| filename)
+                        },
+                        Message::ExportComplete,
+                    );
+                }
+            }
+            Message::ExportPdf => {
+                if let Some(record) = self.current_export_record() {
+                    let filename = export::default_filename(&record.score_name, "pdf");
+                    return Task::perform(
+                        async move {
+                            export::pdf_export::export_to_pdf_file(&record, &filename)
+                                .map(|()| filename)
+                        },
+                        Message::ExportComplete,
+                    );
+                }
+            }
+            Message::ExportComplete(result) => {
+                if let AppState::ScoreCalculation { ref mut error, .. } = self.state {
+                    match result {
+                        Ok(filename) => {
+                            let msg = match self.language {
+                                Language::German => format!("Exportiert: {}", filename),
+                                Language::English => format!("Exported: {}", filename),
+                            };
+                            *error = Some(msg); // Reuse error field for status messages
+                        }
+                        Err(e) => {
+                            let msg = match self.language {
+                                Language::German => format!("Export fehlgeschlagen: {}", e),
+                                Language::English => format!("Export failed: {}", e),
+                            };
+                            *error = Some(msg);
+                        }
+                    }
+                }
+            }
         }
         Task::none()
+    }
+
+    /// Build an ExportRecord from the current calculation result (if any)
+    fn current_export_record(&self) -> Option<ExportRecord> {
+        if let AppState::ScoreCalculation {
+            ref score_id,
+            ref result,
+            ..
+        } = self.state
+        {
+            let calc_result = result.as_ref()?;
+            let score_def = self
+                .score_library
+                .as_ref()
+                .and_then(|lib| lib.get_score(score_id))?;
+            let score_name = match self.language {
+                Language::German => &score_def.name_de,
+                Language::English => &score_def.name,
+            };
+            let use_german = self.language == Language::German;
+            Some(ExportRecord::from_result(
+                calc_result,
+                score_name,
+                use_german,
+            ))
+        } else {
+            None
+        }
     }
 
     fn theme(&self) -> iced::Theme {
@@ -533,6 +640,9 @@ impl KlinScore {
                     self.language,
                     Message::Input(InputMessage::Reset),
                     Message::BackToScoreSelection,
+                    Message::ExportCsv,
+                    Message::ExportJson,
+                    Message::ExportPdf,
                 )
             } else {
                 let form = ui::score_input_form(score_def, input_state, self.language, |msg| {

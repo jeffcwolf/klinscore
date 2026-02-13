@@ -1,5 +1,6 @@
 // KlinScore library - reusable components
 pub mod config;
+pub mod export;
 pub mod scores;
 pub mod ui;
 
