@@ -11,7 +11,7 @@ fn main() {
 
             // Display scores by specialty
             for specialty in library.get_specialties() {
-                println!("━━━ {} ━━━", specialty.to_english());
+                println!("━━━ {} ━━━", specialty.english());
                 let scores = library.get_scores_for_specialty(specialty);
 
                 for score in scores {

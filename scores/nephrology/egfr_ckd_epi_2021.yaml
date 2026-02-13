@@ -11,6 +11,7 @@ reference: "Inker LA, et al. New Creatinine- and Cystatin C-Based Equations to E
 validation_status: "peer_reviewed"
 description: "Kidney function estimation using 2021 race-free CKD-EPI equation"
 description_de: "Nierenfunktionsschätzung mit der 2021 rassenfreien CKD-EPI-Gleichung"
+formula: "ckd_epi_2021"
 
 inputs:
   - field: "age"

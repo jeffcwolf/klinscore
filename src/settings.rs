@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// Application theme options
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AppTheme {
+    #[default]
     Light,
     Dark,
     Sepia,
@@ -19,7 +20,7 @@ impl AppTheme {
         &ALL_THEMES
     }
 
-    pub fn to_string(&self) -> &'static str {
+    pub fn label(self) -> &'static str {
         match self {
             AppTheme::Light => "Light",
             AppTheme::Dark => "Dark",
@@ -27,7 +28,7 @@ impl AppTheme {
         }
     }
 
-    pub fn to_german(&self) -> &'static str {
+    pub fn german(self) -> &'static str {
         match self {
             AppTheme::Light => "Hell",
             AppTheme::Dark => "Dunkel",
@@ -36,7 +37,7 @@ impl AppTheme {
     }
 
     /// Get the Iced theme for this app theme
-    pub fn to_iced_theme(&self) -> iced::Theme {
+    pub fn iced_theme(self) -> iced::Theme {
         match self {
             AppTheme::Light => iced::Theme::Light,
             AppTheme::Dark => iced::Theme::Dark,
@@ -65,15 +66,9 @@ impl AppTheme {
     }
 }
 
-impl Default for AppTheme {
-    fn default() -> Self {
-        AppTheme::Light
-    }
-}
-
 impl fmt::Display for AppTheme {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.label())
     }
 }
 

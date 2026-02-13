@@ -53,7 +53,7 @@ enum AppState {
         specialty: Specialty,
         score_id: String,
         input_state: ScoreInputState,
-        result: Option<CalculationResult>,
+        result: Option<Box<CalculationResult>>,
         error: Option<String>,
     },
     History,
@@ -215,7 +215,7 @@ impl KlinScore {
                                             self.history.push(entry);
                                             persistence::save_history(&self.history);
 
-                                            *result = Some(calc_result);
+                                            *result = Some(Box::new(calc_result));
                                             *error = None;
                                         }
                                         Err(e) => {
@@ -370,7 +370,7 @@ impl KlinScore {
     }
 
     fn theme(&self) -> iced::Theme {
-        self.settings.theme.to_iced_theme()
+        self.settings.theme.iced_theme()
     }
 
     fn view(&self) -> Element<'_, Message> {
@@ -435,7 +435,7 @@ impl KlinScore {
                 *specialty,
                 score_id,
                 input_state,
-                result.as_ref(),
+                result.as_deref(),
                 error.as_deref(),
             ),
             AppState::History => self.history_view(),
@@ -533,8 +533,8 @@ impl KlinScore {
 
     fn score_selection_view(&self, specialty: Specialty) -> Element<'_, Message> {
         let title = match self.language {
-            Language::German => format!("{} - Score auswählen", specialty.to_german()),
-            Language::English => format!("{} - Select Score", specialty.to_english()),
+            Language::German => format!("{} - Score auswählen", specialty.german()),
+            Language::English => format!("{} - Select Score", specialty.english()),
         };
 
         let subtitle = match self.language {
@@ -755,8 +755,8 @@ impl KlinScore {
                 };
 
                 let specialty_text = match self.language {
-                    Language::German => entry.specialty.to_german(),
-                    Language::English => entry.specialty.to_english(),
+                    Language::German => entry.specialty.german(),
+                    Language::English => entry.specialty.english(),
                 };
 
                 let entry_widget = container(
@@ -1005,8 +1005,8 @@ impl KlinScore {
                 }
 
                 let specialty_name = match self.language {
-                    Language::German => specialty.to_german(),
-                    Language::English => specialty.to_english(),
+                    Language::German => specialty.german(),
+                    Language::English => specialty.english(),
                 };
 
                 score_items.push(text(specialty_name).size(16).into());
@@ -1081,8 +1081,8 @@ impl KlinScore {
         .width(Length::Fixed(200.0));
 
         let theme_display = match self.language {
-            Language::German => self.settings.theme.to_german(),
-            Language::English => self.settings.theme.to_string(),
+            Language::German => self.settings.theme.german(),
+            Language::English => self.settings.theme.label(),
         };
 
         let content = column![

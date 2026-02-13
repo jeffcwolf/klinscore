@@ -532,6 +532,20 @@ fn test_caprini_very_low_risk() {
 }
 
 #[test]
+fn test_caprini_low_risk() {
+    // Score=2 falls in "Low Risk" category
+    let library = load_all_scores("scores/").unwrap();
+    let score = library.get_score("caprini").unwrap();
+
+    let mut inputs = HashMap::new();
+    inputs.insert("major_surgery".to_string(), InputValue::Boolean(true)); // 2pt
+
+    let result = calculate_score(score, &inputs).unwrap();
+    assert_eq!(result.total_score, 2);
+    assert_eq!(result.risk, "Low Risk");
+}
+
+#[test]
 fn test_caprini_moderate_risk() {
     // 1-point + 2-point factors = 3 (moderate)
     let library = load_all_scores("scores/").unwrap();
@@ -616,9 +630,7 @@ fn test_egfr_required_fields() {
 
 #[test]
 fn test_egfr_calculation_with_all_fields() {
-    // This score uses points: 0 for all fields (it's a diagnostic formula)
-    // The total "score" is 0, which won't match any interpretation
-    // This tests that the YAML loads and inputs are accepted
+    // CKD-EPI 2021 formula: 55-year-old male, creatinine 100 μmol/L
     let library = load_all_scores("scores/").unwrap();
     let score = library.get_score("egfr_ckd_epi_2021").unwrap();
 
@@ -627,15 +639,40 @@ fn test_egfr_calculation_with_all_fields() {
     inputs.insert("sex".to_string(), InputValue::Dropdown("male".to_string()));
     inputs.insert("creatinine".to_string(), InputValue::Number(100.0));
 
-    // All fields have points: 0, so total = 0
-    // This won't match any interpretation (lowest is ≥90 which is for eGFR values)
-    // This is expected - eGFR needs a real formula, not point-based scoring
-    let result = calculate_score(score, &inputs);
-    // It's ok if this errors with NoInterpretation - the YAML is a simplified representation
+    let result = calculate_score(score, &inputs).unwrap();
+    // 55M Scr=100μmol/L (1.13mg/dL) -> eGFR ~76 (G2 stage)
     assert!(
-        result.is_ok() || format!("{:?}", result).contains("NoInterpretation"),
-        "Should either succeed or fail with NoInterpretation, got: {:?}",
-        result
+        result.total_score >= 70 && result.total_score <= 85,
+        "eGFR for 55M Scr=100μmol/L should be ~76, got {}",
+        result.total_score
+    );
+    assert!(
+        result.risk.contains("G2"),
+        "Should be stage G2, got: {}",
+        result.risk
+    );
+}
+
+#[test]
+fn test_egfr_stage_g3a() {
+    // 70-year-old female, creatinine 120 μmol/L -> G3a stage
+    let library = load_all_scores("scores/").unwrap();
+    let score = library.get_score("egfr_ckd_epi_2021").unwrap();
+
+    let mut inputs = HashMap::new();
+    inputs.insert("age".to_string(), InputValue::Number(70.0));
+    inputs.insert(
+        "sex".to_string(),
+        InputValue::Dropdown("female".to_string()),
+    );
+    inputs.insert("creatinine".to_string(), InputValue::Number(120.0));
+
+    let result = calculate_score(score, &inputs).unwrap();
+    // Should fall in G3a range (45-59)
+    assert!(
+        result.total_score >= 40 && result.total_score <= 60,
+        "eGFR should be in G3a range, got {}",
+        result.total_score
     );
 }
 
@@ -668,8 +705,8 @@ fn test_kfre_required_fields() {
 }
 
 #[test]
-fn test_kfre_calculation() {
-    // Similar to eGFR - all fields have points: 0
+fn test_kfre_calculation_high_risk() {
+    // KFRE 4-variable: 65F, eGFR=35, ACR=30 mg/mmol -> moderate-high risk
     let library = load_all_scores("scores/").unwrap();
     let score = library.get_score("kfre").unwrap();
 
@@ -682,10 +719,36 @@ fn test_kfre_calculation() {
     inputs.insert("egfr".to_string(), InputValue::Number(35.0));
     inputs.insert("acr".to_string(), InputValue::Number(30.0));
 
-    let result = calculate_score(score, &inputs);
+    let result = calculate_score(score, &inputs).unwrap();
+    // Low eGFR + high ACR -> risk should be > 2%
     assert!(
-        result.is_ok() || format!("{:?}", result).contains("NoInterpretation"),
-        "Should handle all-zero-points gracefully"
+        result.total_score >= 2,
+        "KFRE 2-year risk should be >=2%, got {}%",
+        result.total_score
+    );
+}
+
+#[test]
+fn test_kfre_calculation_low_risk() {
+    // KFRE 4-variable: 50F, eGFR=55, ACR=3 mg/mmol -> low risk
+    let library = load_all_scores("scores/").unwrap();
+    let score = library.get_score("kfre").unwrap();
+
+    let mut inputs = HashMap::new();
+    inputs.insert("age".to_string(), InputValue::Number(50.0));
+    inputs.insert(
+        "sex".to_string(),
+        InputValue::Dropdown("female".to_string()),
+    );
+    inputs.insert("egfr".to_string(), InputValue::Number(55.0));
+    inputs.insert("acr".to_string(), InputValue::Number(3.0));
+
+    let result = calculate_score(score, &inputs).unwrap();
+    // Higher eGFR + low ACR -> very low risk (<3%)
+    assert!(
+        result.total_score <= 3,
+        "KFRE 2-year risk should be <=3%, got {}%",
+        result.total_score
     );
 }
 

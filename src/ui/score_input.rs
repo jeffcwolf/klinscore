@@ -31,6 +31,12 @@ pub struct ScoreInputState {
     pub text_buffers: HashMap<String, String>,
 }
 
+impl Default for ScoreInputState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ScoreInputState {
     pub fn new() -> Self {
         Self {

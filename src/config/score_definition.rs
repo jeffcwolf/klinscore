@@ -45,6 +45,11 @@ pub struct ScoreDefinition {
     /// Interpretation rules mapping scores to risk categories
     pub interpretation: Vec<InterpretationRule>,
 
+    /// Optional formula identifier for formula-based scores (e.g., "ckd_epi_2021", "kfre_4var")
+    /// When set, the calculator uses a built-in formula instead of point summation.
+    #[serde(default)]
+    pub formula: Option<String>,
+
     /// Optional metadata (e.g., tags, keywords)
     #[serde(default)]
     pub metadata: HashMap<String, String>,
@@ -66,7 +71,7 @@ pub enum Specialty {
 
 impl Specialty {
     /// Get German translation of specialty
-    pub fn to_german(&self) -> &'static str {
+    pub fn german(self) -> &'static str {
         match self {
             Specialty::Cardiology => "Kardiologie",
             Specialty::Nephrology => "Nephrologie",
@@ -79,7 +84,7 @@ impl Specialty {
     }
 
     /// Get English name of specialty
-    pub fn to_english(&self) -> &'static str {
+    pub fn english(self) -> &'static str {
         match self {
             Specialty::Cardiology => "Cardiology",
             Specialty::Nephrology => "Nephrology",
@@ -317,9 +322,9 @@ mod tests {
 
     #[test]
     fn test_specialty_translations() {
-        assert_eq!(Specialty::Cardiology.to_german(), "Kardiologie");
-        assert_eq!(Specialty::Cardiology.to_english(), "Cardiology");
-        assert_eq!(Specialty::Nephrology.to_german(), "Nephrologie");
+        assert_eq!(Specialty::Cardiology.german(), "Kardiologie");
+        assert_eq!(Specialty::Cardiology.english(), "Cardiology");
+        assert_eq!(Specialty::Nephrology.german(), "Nephrologie");
     }
 
     #[test]
@@ -327,7 +332,7 @@ mod tests {
         assert_eq!(RiskLevel::Low.color(), "#8BC34A");
         assert_eq!(RiskLevel::High.color(), "#FF9800");
 
-        let (r, g, b) = RiskLevel::VeryHigh.rgb();
+        let (r, _g, _b) = RiskLevel::VeryHigh.rgb();
         assert!((r - 0.957).abs() < 0.001);
     }
 

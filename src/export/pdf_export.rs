@@ -14,7 +14,7 @@ const LINE_HEIGHT_MM: f32 = 6.0;
 /// Export a single calculation result to PDF file
 pub fn export_to_pdf_file(record: &ExportRecord, path: &str) -> Result<(), String> {
     let (doc, page1, layer1) = PdfDocument::new(
-        &format!("KlinScore - {}", record.score_name),
+        format!("KlinScore - {}", record.score_name),
         Mm(PAGE_WIDTH_MM),
         Mm(PAGE_HEIGHT_MM),
         "Content",

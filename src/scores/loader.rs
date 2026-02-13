@@ -365,6 +365,7 @@ interpretation:
             description_de: String::new(),
             inputs: vec![],
             interpretation: vec![],
+            formula: None,
             metadata: HashMap::new(),
         };
 

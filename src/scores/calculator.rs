@@ -111,6 +111,7 @@ pub struct CalculationResult {
 
 impl CalculationResult {
     /// Get points for a field by name (for testing)
+    #[allow(dead_code)]
     pub fn get_field_points(&self, field_name: &str) -> Option<i32> {
         self.field_scores
             .iter()
@@ -149,6 +150,11 @@ pub fn calculate_score(
     score_def: &ScoreDefinition,
     inputs: &HashMap<String, InputValue>,
 ) -> Result<CalculationResult, CalculationError> {
+    // If this score uses a formula, dispatch to formula engine
+    if let Some(ref formula) = score_def.formula {
+        return calculate_formula_score(score_def, inputs, formula);
+    }
+
     let mut total_score = 0;
     let mut field_scores = Vec::new();
 
@@ -511,6 +517,40 @@ fn matches_score_range(range: &ScoreRange, score: i32) -> Result<bool, Calculati
     }
 }
 
+/// Calculate a formula-based score (e.g., eGFR, KFRE)
+fn calculate_formula_score(
+    score_def: &ScoreDefinition,
+    inputs: &HashMap<String, InputValue>,
+    formula: &str,
+) -> Result<CalculationResult, CalculationError> {
+    // Validate required fields
+    for input_field in &score_def.inputs {
+        if input_field.required && !inputs.contains_key(&input_field.field) {
+            return Err(CalculationError::MissingRequiredField {
+                field: input_field.field.clone(),
+            });
+        }
+    }
+
+    let result = crate::scores::formulas::calculate_formula(formula, inputs)?;
+
+    // Find matching interpretation using the formula result
+    let interpretation = find_interpretation(score_def, result.value)?;
+
+    Ok(CalculationResult {
+        total_score: result.value,
+        field_scores: result.field_scores,
+        risk_level: interpretation.risk_level,
+        risk: interpretation.risk.clone(),
+        risk_de: interpretation.risk_de.clone(),
+        recommendation: interpretation.recommendation.clone(),
+        recommendation_de: interpretation.recommendation_de.clone(),
+        details: interpretation.details.clone(),
+        details_de: interpretation.details_de.clone(),
+        interpretation: interpretation.clone(),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -595,6 +635,7 @@ mod tests {
                     details_de: None,
                 },
             ],
+            formula: None,
             metadata: HashMap::new(),
         }
     }
