@@ -16,6 +16,44 @@ A fast, offline-first desktop application for calculating clinical scores used i
 
 ---
 
+## Screenshots
+
+<div align="center">
+
+### Welcome Screen
+![Welcome screen showing specialty selection](screenshots/01_welcome.png)
+*Main screen with specialty cards and score count — shown in German.*
+
+### Score Input Form
+![Score input form for CHA2DS2-VA](screenshots/02_score_form_cha2ds2va.png)
+*CHA2DS2-VA stroke risk form — checkboxes, age input, and guideline reference.*
+
+![Score input form for eGFR](screenshots/03_score_form_egfr.png)
+*eGFR CKD-EPI 2021 — formula-based score with numeric inputs and unit display.*
+
+### Calculation Results
+![Completed CHA2DS2-VA calculation](screenshots/04_result_cha2ds2va.png)
+*Point-based result: color-coded risk level, recommendation, and points breakdown.*
+
+![Completed eGFR calculation](screenshots/05_result_egfr.png)
+*Formula-based result: computed eGFR value with CKD stage classification.*
+
+### About — Methodology & Sources
+![About page showing score methodology and references](screenshots/06_about_methodology.png)
+*Full transparency: calculation method, formula, inputs, and clickable DOI links for every score.*
+
+### Calculation History
+![Calculation history view](screenshots/07_history.png)
+*Session history with score name, result, risk level, and timestamp.*
+
+### English / Deutsch
+![English vs German interface comparison](screenshots/08_language_comparison.png)
+*Instant language toggle — all labels, recommendations, and risk levels switch between German and English.*
+
+</div>
+
+---
+
 ## 🎯 Why KlinScore?
 
 Clinical scores are essential for evidence-based medicine, but existing solutions have problems:
@@ -165,7 +203,7 @@ Errors clear automatically when you modify inputs.
 - **Total scores**: 9
 - **Specialties**: 3
 - **Charité Tier 1+2 coverage**: 86% (6/7 scores)
-- **All tests passing**: ✅ 23/23
+- **All tests passing**: ✅ 98 tests
 
 ---
 
@@ -337,30 +375,26 @@ All new scores must:
 ## 🗺️ Roadmap
 
 ### Version 1.0 (MVP) - ✅ **Complete**
-- [x] 9 validated clinical scores
+- [x] 9 validated clinical scores (7 point-based, 2 formula-based)
 - [x] Multi-specialty coverage (Cardiology, Nephrology, Anesthesiology)
 - [x] Theme support (Light/Dark/Sepia)
-- [x] Error handling and validation
+- [x] Error handling and input validation
 - [x] German/English localization
-- [x] Comprehensive test suite
+- [x] Comprehensive test suite (98 tests)
+- [x] Calculation history with persistence
+- [x] Export to CSV, JSON, and PDF
+- [x] Settings persistence across sessions
+- [x] About page with full methodology transparency and clickable DOI links
 
 ### Version 1.1 (Coming Soon)
-- [ ] Calculation history (save recent calculations)
-- [ ] PDF export (print results)
-- [ ] CSV export (for records)
 - [ ] Keyboard shortcuts system
 - [ ] CHA2DS2-VASc score (legacy AF score)
-
-### Version 1.2 (Planned)
-- [ ] More scores (Wells, TIMI, Apache II, etc.)
-- [ ] In-app help system
-- [ ] Settings persistence (save preferences)
-- [ ] Score favorites/bookmarks
 - [ ] Cross-platform binaries (no Rust install needed)
 
 ### Future Considerations
-- [ ] Offline documentation
+- [ ] More scores (Wells, TIMI, Apache II, etc.)
 - [ ] Score comparison view
+- [ ] Score favorites/bookmarks
 - [ ] Multi-patient mode
 - [ ] Clinical decision pathways
 - [ ] Integration with hospital systems (HL7/FHIR)
