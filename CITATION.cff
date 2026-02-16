@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+title: "klinscore"
+type: software
+authors:
+  - family-names: "Wolf"
+    given-names: "Jeffrey C."
+    email: "research_coder@noreply.codeberg.org"
+    orcid: "https://orcid.org/0009-0007-9879-4476"
+version: "0.1.0"
+license: Apache-2.0
+date-released: "2026-02-16"
+repository-code: "https://codeberg.org/YOUR-ORG/klinscore"
+abstract: "A fast, offline-first desktop application for calculating clinical scores used in German and European hospitals. Built with Rust and designed for physician workflows."
+keywords:
+  - research-software
+  - clinical scores
+  - Rust
