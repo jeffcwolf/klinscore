@@ -174,3 +174,7 @@ screenshots/*.pdf
 
 # Ignore docs in _docs folder
 _docs/
+
+# Claude Code files
+.claude/
+CLAUDE.md
