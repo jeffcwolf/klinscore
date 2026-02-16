@@ -1,5 +1,7 @@
 # KlinScore
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18663517.svg)](https://doi.org/10.5281/zenodo.18663517)
+
 **Clinical Score Calculator for Evidence-Based Medicine**
 
 A fast, offline-first desktop application for calculating clinical scores used in German and European hospitals. Built with Rust and designed for physician workflows.
