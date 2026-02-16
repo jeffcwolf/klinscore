@@ -178,3 +178,8 @@ _docs/
 # Claude Code files
 .claude/
 CLAUDE.md
+
+# Security
+*.pem
+*.key
+id_rsa
