@@ -1,0 +1,44 @@
+name: klinscore
+description: "An open-source clinical score calculator implementing evidence-based risk scores across cardiology, nephrology, and anaesthesiology per German and European guidelines."
+status: active
+category: cli-tool
+language: rust
+forge: github
+visibility: public
+tags: [medicine, clinical, open-source]
+notes: "Designed to be maintainable by clinicians, with a German/English interface."
+created: ""
+last_touched: ""
+# ── Website publication (functionsandfolios.com) ──────────────────────────────
+website:
+  publish: true
+  slug: klinscore
+  order: 99
+  category: "Open-Source Tools"
+  audience: "Clinicians and medical researchers"
+  platform: [macOS, Windows, Linux]
+  license: MIT
+  internal_url: "/digital-projects/klinscore"
+  video_url: ""
+  download_url: ""
+  screenshots: []
+  description_long: |
+    Klinscore is an open-source clinical score calculator implementing
+    evidence-based risk scores across cardiology, nephrology, and
+    anaesthesiology, following German and European guidelines (ESC, AWMF,
+    KDIGO).
+
+    Designed to be maintainable by clinicians rather than developers — the
+    score definitions are data-driven and separated from the application logic,
+    so updating or adding scores does not require code changes.
+
+    ## Supported Score Categories
+
+    - Cardiology (ESC guidelines)
+    - Nephrology (KDIGO guidelines)
+    - Anaesthesiology (AWMF guidelines)
+
+    ## Interface
+
+    German/English bilingual interface. Runs locally with no network
+    dependency.
