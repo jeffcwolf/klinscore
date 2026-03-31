@@ -3,7 +3,7 @@ description: "An open-source clinical score calculator implementing evidence-bas
 status: active
 category: desktop-app
 language: rust
-forge: github
+forge: multiple
 visibility: public
 tags: [medicine, clinical, open-source]
 notes: "Designed to be maintainable by clinicians, with a German/English interface."
@@ -22,6 +22,7 @@ website:
   video_url: ""
   download_url: ""
   screenshots: []
+  codeberg_url: "https://codeberg.org/research_coder/klinscore"
   description_long: |
     Klinscore is an open-source clinical score calculator implementing
     evidence-based risk scores across cardiology, nephrology, and
