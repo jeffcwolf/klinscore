@@ -1,7 +1,7 @@
-name: klinscore
+name: Klinscore
 description: "An open-source clinical score calculator implementing evidence-based risk scores across cardiology, nephrology, and anaesthesiology per German and European guidelines."
 status: active
-category: cli-tool
+category: desktop-app
 language: rust
 forge: github
 visibility: public
@@ -14,7 +14,7 @@ website:
   publish: true
   slug: klinscore
   order: 99
-  category: "Open-Source Tools"
+  category: "Desktop Applications"
   audience: "Clinicians and medical researchers"
   platform: [macOS, Windows, Linux]
   license: MIT
