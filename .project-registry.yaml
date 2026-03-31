@@ -13,7 +13,7 @@ last_touched: ""
 website:
   publish: true
   slug: klinscore
-  order: 99
+  order: 40
   category: "Desktop Applications"
   audience: "Clinicians and medical researchers"
   platform: [macOS, Windows, Linux]
